@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useState, type FormEvent, type ReactNode } from 'react';
 
 import { useSession } from '@/components/client';
+import { Logo, LogoMark } from '@/components/logo';
 import type { Locale } from '@/lib/i18n';
 import * as api from '@/lib/studio/api';
 import { isValidHandle, normalizeHandle } from '@/lib/studio/image-utils';
@@ -82,7 +83,7 @@ export function StudioShell({ locale, children }: { locale: Locale; children: Re
     <main className="page">
       <div className="wrap">
         <header className="topbar">
-          <Link className="address" href={`/${locale}`}>Small Gallery</Link>
+          <Logo href={`/${locale}`} />
           <a className="btn btn-quiet" href={locale === 'ko' ? '/en/studio' : '/ko/studio'}>{locale === 'ko' ? 'English' : '한국어'}</a>
         </header>
         {body}
@@ -104,7 +105,10 @@ function StudioNav() {
   return (
     <aside className="studio-nav">
       <div className="studio-brand">
-        <span className="meta">Small Gallery · {t.studio}</span>
+        <a href={`/${locale}`} className="studio-brand-logo">
+          <LogoMark size={20} />
+          <span className="meta">Small Gallery · {t.studio}</span>
+        </a>
         <strong>{gallery.title}</strong>
       </div>
       <nav aria-label={t.studio}>

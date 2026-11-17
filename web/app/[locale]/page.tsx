@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 
+import { Logo } from '@/components/logo';
+
 import { isLocale, messages, parseHandle } from '@/lib/i18n';
 import { siteOrigin } from '@/lib/site';
 
@@ -24,7 +26,7 @@ export default async function Home({
     <main className="page">
       <div className="wrap">
         <header className="topbar">
-          <span className="address">Small Gallery</span>
+          <Logo href={`/${locale}`} />
           <a className="btn btn-quiet" href={locale === 'ko' ? '/en' : '/ko'} hrefLang={locale === 'ko' ? 'en' : 'ko'}>
             {t.language}
           </a>

@@ -256,3 +256,15 @@ button.chip[aria-pressed='true'] { background: var(--ink); color: var(--ground);
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10;
   background: var(--ink); color: var(--ground); padding: 12px 18px; border-radius: 10px; font-size: 14px; max-width: calc(100vw - 32px);
 }
+
+/* Logo ------------------------------------------------------------------- */
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); min-height: 44px; }
+.logo:hover { text-decoration: none; }
+.logo:hover .logo-mark { transform: rotate(-4deg); }
+.logo-mark { flex-shrink: 0; transition: transform 0.2s ease; }
+.logo-word { font-family: var(--serif); font-weight: 600; font-size: 19px; letter-spacing: -0.3px; line-height: 1; white-space: nowrap; }
+.logo-word em { font-style: normal; color: var(--accent); }
+.theme-dark .logo-mark { --logo-sky: #262a3a; --logo-hill: #8ea2e8; }
+.studio-brand-logo { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
+.studio-brand-logo:hover { text-decoration: none; }
+@media (prefers-reduced-motion: reduce) { .logo-mark { transition: none; } }
