@@ -27,8 +27,19 @@ class StudioShell extends ConsumerWidget {
     final gallery = ref.watch(myGalleryProvider);
     return gallery.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      // A saved session can outlive the account or hit a server problem;
+      // always leave a way out besides retrying.
       error: (e, _) => Scaffold(
-        body: AsyncBody(value: gallery, builder: (_) => const SizedBox(), onRetry: () => ref.invalidate(myGalleryProvider)),
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          AsyncBody(value: gallery, builder: (_) => const SizedBox(), onRetry: () => ref.invalidate(myGalleryProvider)),
+          TextButton(
+            onPressed: () async {
+              await ref.read(repositoryProvider).signOut();
+              ref.invalidate(myGalleryProvider);
+            },
+            child: Text(context.l10n.signOut),
+          ),
+        ]),
       ),
       data: (g) => g == null ? const OnboardingScreen() : _scaffold(context, ref),
     );

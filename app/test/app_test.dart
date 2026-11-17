@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:small_gallery/app.dart';
+import 'package:small_gallery/data/models.dart';
 import 'package:small_gallery/state/providers.dart';
 
 import 'fakes.dart';
@@ -79,4 +80,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('갤러리를 찾을 수 없어요'), findsOneWidget);
   });
+
+  testWidgets('when loading the gallery fails, the artist can sign out', (tester) async {
+    final repo = _FailingGalleryRepository();
+    await pumpApp(tester, repo);
+    expect(find.text('문제가 생겼어요. 잠시 후 다시 시도해 주세요.'), findsOneWidget);
+
+    await tester.tap(find.text('로그아웃'));
+    await tester.pumpAndSettle();
+    expect(find.text('누구나 자기 작품의 관장이 되는 곳'), findsOneWidget);
+  });
+}
+
+class _FailingGalleryRepository extends FakeRepository {
+  _FailingGalleryRepository() : super(userId: artistId);
+
+  @override
+  Future<Gallery?> myGallery() async {
+    if (currentUserId == null) return null;
+    throw const AppException('unknown:42501:permission denied');
+  }
 }
