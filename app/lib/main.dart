@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 import 'data/supabase_repository.dart';
 import 'state/providers.dart';
+import 'ui/common.dart' show siteUrl;
 
 /// Pass these at build time:
 ///   flutter run --dart-define=SUPABASE_URL=https://xxxx.supabase.co --dart-define=SUPABASE_ANON_KEY=...
@@ -17,8 +18,9 @@ const oauthRedirect = 'app.smallgallery://login-callback';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    runApp(const _MissingConfigApp());
+  final problem = configProblem(url: supabaseUrl, key: supabaseAnonKey, site: siteUrl);
+  if (problem != null) {
+    runApp(_MissingConfigApp(problem));
     return;
   }
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
@@ -34,20 +36,42 @@ Future<void> main() async {
   ));
 }
 
+/// What is wrong with the build-time settings, or null when they look usable.
+/// Catches leftovers from pasting into the example command (e.g. "여sb_…").
+String? configProblem({required String url, required String key, required String site}) {
+  if (url.isEmpty || key.isEmpty) {
+    return 'SUPABASE_URL and SUPABASE_ANON_KEY are not set.\n'
+        'Run with --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...';
+  }
+  final parsed = Uri.tryParse(url);
+  if (parsed == null || parsed.scheme != 'https' || parsed.host.isEmpty) {
+    return 'SUPABASE_URL is not a valid https address: "$url"';
+  }
+  if (!RegExp(r'^[A-Za-z0-9._\-]+$').hasMatch(key)) {
+    return 'SUPABASE_ANON_KEY contains characters a key cannot have: "$key"\n'
+        'It should start with sb_publishable_ (or eyJ for older keys), with nothing before it.';
+  }
+  final siteUri = Uri.tryParse(site);
+  final host = siteUri?.host ?? '';
+  final realHost = host == 'localhost' || RegExp(r'^[a-z0-9-]+(\.[a-z0-9-]+)+$').hasMatch(host);
+  if (siteUri == null || !siteUri.hasScheme || !realHost) {
+    return 'SITE_URL is not a valid address: "$site"';
+  }
+  return null;
+}
+
 class _MissingConfigApp extends StatelessWidget {
-  const _MissingConfigApp();
+  const _MissingConfigApp(this.problem);
+
+  final String problem;
 
   @override
-  Widget build(BuildContext context) => const MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
         home: Scaffold(
           body: Center(
             child: Padding(
-              padding: EdgeInsets.all(24),
-              child: Text(
-                'SUPABASE_URL and SUPABASE_ANON_KEY are not set.\n'
-                'Run with --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...',
-                textAlign: TextAlign.center,
-              ),
+              padding: const EdgeInsets.all(24),
+              child: SelectableText(problem, textAlign: TextAlign.center),
             ),
           ),
         ),
