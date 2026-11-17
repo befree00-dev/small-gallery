@@ -24,14 +24,14 @@ Future<ProviderContainer> pumpApp(WidgetTester tester, FakeRepository repo, {Str
 void main() {
   testWidgets('signed-out people land on the welcome screen', (tester) async {
     await pumpApp(tester, FakeRepository());
-    expect(find.text('누구나 자기 작품의 관장이 되는 곳'), findsOneWidget);
+    expect(find.text('누구나 자신만의 작은 갤러리를 가질 수 있는 곳'), findsOneWidget);
   });
 
   testWidgets('the welcome screen switches to English', (tester) async {
     await pumpApp(tester, FakeRepository());
     await tester.tap(find.text('EN'));
     await tester.pumpAndSettle();
-    expect(find.text('Where everyone curates their own work'), findsOneWidget);
+    expect(find.text('Where anyone can have a small gallery of their own'), findsOneWidget);
   });
 
   testWidgets('an artist goes straight to their gallery and its rooms', (tester) async {
@@ -88,7 +88,7 @@ void main() {
 
     await tester.tap(find.text('로그아웃'));
     await tester.pumpAndSettle();
-    expect(find.text('누구나 자기 작품의 관장이 되는 곳'), findsOneWidget);
+    expect(find.text('누구나 자신만의 작은 갤러리를 가질 수 있는 곳'), findsOneWidget);
   });
 }
 

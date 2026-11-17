@@ -13,7 +13,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appTitle => 'Small Gallery';
 
   @override
-  String get welcomeHeadline => '누구나 자기 작품의 관장이 되는 곳';
+  String get welcomeHeadline => '누구나 자신만의 작은 갤러리를 가질 수 있는 곳';
 
   @override
   String get welcomeBody => '작품을 올리면 바로 나만의 작은 갤러리가 열립니다.';

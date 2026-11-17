@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeHeadline.
   ///
   /// In ko, this message translates to:
-  /// **'누구나 자기 작품의 관장이 되는 곳'**
+  /// **'누구나 자신만의 작은 갤러리를 가질 수 있는 곳'**
   String get welcomeHeadline;
 
   /// No description provided for @welcomeBody.

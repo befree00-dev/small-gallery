@@ -13,7 +13,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Small Gallery';
 
   @override
-  String get welcomeHeadline => 'Where everyone curates their own work';
+  String get welcomeHeadline =>
+      'Where anyone can have a small gallery of their own';
 
   @override
   String get welcomeBody =>
