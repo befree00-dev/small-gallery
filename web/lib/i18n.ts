@@ -41,7 +41,7 @@ export function pick(ko: string, en: string | null | undefined, locale: Locale):
 }
 
 const ko = {
-  tagline: '누구나 자기 작품의 관장이 되는 곳',
+  tagline: '누구나 자신만의 작은 갤러리를 가질 수 있는 곳',
   intro: '아마추어 화가와 사진가의 작은 갤러리. 주소를 알면 바로 둘러볼 수 있어요.',
   visitLabel: '갤러리 주소',
   visit: '둘러보기',
@@ -96,7 +96,7 @@ type Dict = {
 };
 
 const en: Dict = {
-  tagline: 'Where everyone curates their own work',
+  tagline: 'Where anyone can have a small gallery of their own',
   intro: 'Small galleries by amateur painters and photographers. Know the address? Walk right in.',
   visitLabel: 'Gallery address',
   visit: 'Visit',

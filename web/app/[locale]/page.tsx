@@ -38,7 +38,7 @@ export default async function Home({
         <form action={`/${locale}`} method="get">
           <label htmlFor="handle" className="visually-hidden">{t.visitLabel}</label>
           <div className="prefix">
-            <span aria-hidden="true">{siteHost}/@</span>
+            <span aria-hidden="true"><span className="prefix-host">{siteHost}/</span>@</span>
             <input id="handle" name="handle" autoComplete="off" autoCapitalize="none" spellCheck={false} required defaultValue={handle ?? ''} />
           </div>
           <button className="btn btn-primary" type="submit">{t.visit}</button>
