@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordRule => 'At least 8 characters';
 
   @override
-  String get onboardingTitle => 'Open your gallery';
+  String get onboardingTitle => 'Create your gallery';
 
   @override
   String get stepField => 'What do you make?';

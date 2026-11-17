@@ -18,7 +18,7 @@
   "authFailed": "Couldn't sign in. Check your email and password.",
   "checkEmail": "We sent you a confirmation email. Open its link, then sign in.",
   "passwordRule": "At least 8 characters",
-  "onboardingTitle": "Open your gallery",
+  "onboardingTitle": "Create your gallery",
   "stepField": "What do you make?",
   "fieldPainting": "Painting",
   "fieldPhoto": "Photography",

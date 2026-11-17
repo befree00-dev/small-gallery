@@ -209,7 +209,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In ko, this message translates to:
-  /// **'갤러리 열기'**
+  /// **'내 갤러리 만들기'**
   String get onboardingTitle;
 
   /// No description provided for @stepField.

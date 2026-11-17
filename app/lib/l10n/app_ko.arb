@@ -18,7 +18,7 @@
   "authFailed": "로그인하지 못했어요. 이메일과 비밀번호를 확인해 주세요.",
   "checkEmail": "확인 메일을 보냈어요. 메일의 링크를 누른 뒤 로그인해 주세요.",
   "passwordRule": "8자 이상",
-  "onboardingTitle": "갤러리 열기",
+  "onboardingTitle": "내 갤러리 만들기",
   "stepField": "어떤 작품을 하시나요?",
   "fieldPainting": "회화",
   "fieldPhoto": "사진",

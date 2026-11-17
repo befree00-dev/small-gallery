@@ -64,7 +64,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get passwordRule => '8자 이상';
 
   @override
-  String get onboardingTitle => '갤러리 열기';
+  String get onboardingTitle => '내 갤러리 만들기';
 
   @override
   String get stepField => '어떤 작품을 하시나요?';
