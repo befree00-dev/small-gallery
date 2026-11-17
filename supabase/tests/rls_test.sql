@@ -267,4 +267,11 @@ do $$ declare ok boolean := false; begin
   assert ok, 'the 101st artwork on the free plan is refused';
 end $$;
 
+-- The app and web name these foreign keys in API embeds
+-- (galleries↔profiles is ambiguous through blocked_authors).
+do $$ begin
+  assert exists (select 1 from pg_constraint where conname = 'galleries_owner_id_fkey'), 'galleries_owner_id_fkey exists';
+  assert exists (select 1 from pg_constraint where conname = 'comments_author_id_fkey'), 'comments_author_id_fkey exists';
+end $$;
+
 \echo 'All RLS tests passed.'

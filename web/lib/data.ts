@@ -3,7 +3,7 @@ import { cache } from 'react';
 import { serverClient } from './supabase';
 import type { Artwork, Comment, Gallery, RatingStats, Room } from './types';
 
-const galleryColumns = 'id, owner_id, handle, title, title_en, bio, bio_en, theme, rating_enabled, comment_policy, profiles(display_name)';
+const galleryColumns = 'id, owner_id, handle, title, title_en, bio, bio_en, theme, rating_enabled, comment_policy, profiles!galleries_owner_id_fkey(display_name)';
 
 // cache(): generateMetadata and the page share one query per request.
 export const getGallery = cache(async (handle: string): Promise<Gallery | null> => {
@@ -55,7 +55,7 @@ export async function getRatingStats(artworkId: string): Promise<RatingStats | n
 export async function getComments(galleryId: string, artworkId: string | null): Promise<Comment[]> {
   let q = serverClient()
     .from('comments')
-    .select('id, author_id, body, status, created_at, profiles(display_name)')
+    .select('id, author_id, body, status, created_at, profiles!comments_author_id_fkey(display_name)')
     .eq('gallery_id', galleryId)
     .eq('status', 'visible');
   q = artworkId ? q.eq('artwork_id', artworkId) : q.is('artwork_id', null);

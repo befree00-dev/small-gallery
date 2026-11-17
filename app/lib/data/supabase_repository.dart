@@ -20,6 +20,9 @@ class SupabaseGalleryRepository implements GalleryRepository {
   final String? oauthRedirect;
 
   static const _deviceKeyPref = 'visitor_device_key';
+
+  // galleries and profiles are joined two ways (owner, and blocked_authors),
+  // so every embed names the foreign key it follows.
   static const _uuid = Uuid();
 
   GoTrueClient get _auth => _client.auth;
@@ -125,7 +128,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
         if (id == null) return null;
         final row = await _client
             .from('galleries')
-            .select('*, profiles(display_name)')
+            .select('*, profiles!galleries_owner_id_fkey(display_name)')
             .eq('owner_id', id)
             .maybeSingle();
         return row == null ? null : Gallery.fromJson(row);
@@ -160,7 +163,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
               'field': field.name,
               'theme': theme.name,
             })
-            .select('*, profiles(display_name)')
+            .select('*, profiles!galleries_owner_id_fkey(display_name)')
             .single();
         final gallery = Gallery.fromJson(row);
         await createRoom(gallery.id, firstRoomTitle);
@@ -331,7 +334,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
   Future<List<Comment>> commentsForModeration(String galleryId) => _guard(() async {
         final rows = await _client
             .from('comments')
-            .select('*, profiles(display_name), artworks(title)')
+            .select('*, profiles!comments_author_id_fkey(display_name), artworks(title)')
             .eq('gallery_id', galleryId)
             .neq('status', 'hidden')
             .order('created_at', ascending: false)
@@ -372,7 +375,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
   Future<Gallery?> galleryByHandle(String handle) => _guard(() async {
         final row = await _client
             .from('galleries')
-            .select('*, profiles(display_name)')
+            .select('*, profiles!galleries_owner_id_fkey(display_name)')
             .eq('handle', normalizeHandle(handle))
             .maybeSingle();
         return row == null ? null : Gallery.fromJson(row);
@@ -422,7 +425,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
 
   @override
   Future<List<Comment>> comments(String galleryId, {String? artworkId}) => _guard(() async {
-        var query = _client.from('comments').select('*, profiles(display_name)').eq('gallery_id', galleryId);
+        var query = _client.from('comments').select('*, profiles!comments_author_id_fkey(display_name)').eq('gallery_id', galleryId);
         query = artworkId == null ? query.isFilter('artwork_id', null) : query.eq('artwork_id', artworkId);
         final uid = currentUserId;
         // Visitors see published comments plus their own that await approval.
@@ -437,7 +440,7 @@ class SupabaseGalleryRepository implements GalleryRepository {
         final row = await _client
             .from('comments')
             .insert({'gallery_id': galleryId, 'artwork_id': artworkId, 'author_id': _requireUser(), 'body': body})
-            .select('*, profiles(display_name)')
+            .select('*, profiles!comments_author_id_fkey(display_name)')
             .single();
         return Comment.fromJson(row);
       });

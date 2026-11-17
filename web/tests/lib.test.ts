@@ -87,3 +87,11 @@ describe('average', () => {
     expect(average(null)).toBe(0);
   });
 });
+
+describe('API embeds', () => {
+  it('name the foreign key for every profiles embed', async () => {
+    const { readFileSync } = await import('node:fs');
+    const source = readFileSync(new URL('../lib/data.ts', import.meta.url), 'utf8');
+    expect(source).not.toMatch(/profiles\(/);
+  });
+});
