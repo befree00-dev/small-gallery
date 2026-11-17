@@ -2,7 +2,9 @@
 -- Galleries, rooms, artworks, and visitor reactions (likes, ratings, comments),
 -- with row-level security so that visitors only ever see what an artist published.
 
-create extension if not exists pgcrypto;
+-- Supabase keeps extensions in the "extensions" schema; functions below call it by name.
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
 
 -- ---------------------------------------------------------------------------
 -- Profiles
@@ -487,7 +489,7 @@ begin
   if auth.uid() is not null then
     key := 'u:' || auth.uid()::text;
   elsif p_device_key is not null and char_length(p_device_key) between 16 and 64 then
-    key := 'd:' || encode(digest(p_device_key, 'sha256'), 'hex');
+    key := 'd:' || encode(extensions.digest(p_device_key, 'sha256'), 'hex');
   else
     raise exception 'visitor_key_required' using errcode = '22023';
   end if;
@@ -519,7 +521,7 @@ as $$
     where l.artwork_id = p_artwork_id
       and l.visitor_key = case
         when auth.uid() is not null then 'u:' || auth.uid()::text
-        else 'd:' || encode(digest(coalesce(p_device_key, ''), 'sha256'), 'hex')
+        else 'd:' || encode(extensions.digest(coalesce(p_device_key, ''), 'sha256'), 'hex')
       end
   );
 $$;
