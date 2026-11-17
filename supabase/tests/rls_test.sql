@@ -38,6 +38,18 @@ insert into public.artworks (id, gallery_id, room_id, title, image_path, thumb_p
   ('30000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', '비공개 전시실의 작품', 'a/3/display.jpg', 'a/3/thumb.jpg', 1600, 2000);
 update public.artworks set visibility = 'private' where id = '30000000-0000-0000-0000-000000000002';
 
+-- The app inserts and reads back in one statement (INSERT … RETURNING), which
+-- also checks the SELECT policy against the new row.
+do $$ declare new_id uuid; begin
+  insert into public.rooms (gallery_id, title) values ('10000000-0000-0000-0000-000000000001', '임시')
+  returning id into new_id;
+  insert into public.artworks (gallery_id, room_id, title, image_path, thumb_path, width, height)
+  values ('10000000-0000-0000-0000-000000000001', new_id, '방금 올린 작품', 'p', 't', 10, 10)
+  returning id into new_id;
+  assert new_id is not null, 'the artist reads back a just-uploaded artwork';
+  delete from public.rooms where title = '임시';
+end $$;
+
 do $$ begin
   assert (select count(*) from public.artworks) = 3, 'the artist sees all of their artworks';
 end $$;
@@ -163,6 +175,15 @@ end $$;
 
 -- Comments and moderation ---------------------------------------------------
 :as_visitor
+do $$ declare st text; begin
+  insert into public.comments (gallery_id, artwork_id, author_id, body)
+  values ('10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001',
+          '00000000-0000-0000-0000-00000000000b', '돌려받기 확인')
+  returning status into st;
+  assert st = 'pending', 'a visitor reads back their own pending comment';
+  delete from public.comments where body = '돌려받기 확인';
+end $$;
+
 insert into public.comments (id, gallery_id, artwork_id, author_id, body)
 values ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001',
         '30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000b', '  분홍빛이 정말 좋아요  ');

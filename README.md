@@ -40,7 +40,7 @@
 ### 1. Supabase 프로젝트
 
 1. [supabase.com](https://supabase.com)에서 프로젝트를 만듭니다.
-2. `supabase/migrations/` 안의 SQL 세 개를 파일 이름 순서대로 실행합니다. SQL Editor에 붙여 넣거나 Supabase CLI로 `supabase db push`.
+2. `supabase/migrations/` 안의 SQL 파일을 파일 이름 순서대로 모두 실행합니다. SQL Editor에 붙여 넣거나 Supabase CLI로 `supabase db push`.
 3. Authentication → URL Configuration에 다음을 추가합니다.
    - Site URL: 웹 주소 (예: `https://smallgallery.app`)
    - Redirect URLs: `app.smallgallery://login-callback`, `https://smallgallery.app/**`
