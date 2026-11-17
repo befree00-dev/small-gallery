@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CopyLink, ProtectedImage, ViewTracker } from '@/components/client';
+import { CopyLink, OwnerLink, ProtectedImage, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
 import { getArtworks, getComments, getGallery, getRooms, groupByRoom } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
@@ -62,6 +62,7 @@ export default async function GalleryPage({ params }: { params: Params }) {
           <span className="address">{siteHost}/@{gallery.handle}</span>
           <div className="actions">
             <a className="btn btn-quiet" href={`/${other}/@${gallery.handle}`} hrefLang={other}>{t.language}</a>
+            <OwnerLink ownerId={gallery.owner_id} locale={locale} />
             <CopyLink url={`${origin}/@${gallery.handle}`} locale={locale} />
           </div>
         </header>

@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | `supabase/` | DB 스키마, 권한 규칙(RLS), 트리거, 저장소 정책, 테스트 | PostgreSQL · Supabase |
 | `app/` | 작가·방문자 앱 (Windows · macOS · iOS · Android) | Flutter 3.50 · Riverpod · go_router |
-| `web/` | 방문자용 공개 웹 갤러리 (링크로 여는 화면) | Next.js 16 · React 19 |
+| `web/` | 공개 웹 갤러리 + 작가용 웹 스튜디오(`/ko/studio`) | Next.js 16 · React 19 |
 
 한국어·영어를 처음부터 지원합니다. 앱과 웹 모두 언어 전환이 되고, 작가는 제목·소개·노트를 영어로 함께 적을 수 있습니다.
 
@@ -21,6 +21,7 @@
 - **상처 없는 피드백**: 평균 평점은 5명 이상 평가해야 방문자에게 공개(작가는 바로 봄), 감상평 승인제/바로 공개/끄기, 금칙어가 있으면 자동 승인 대기, 작성자 차단, 신고.
 - **반응 탭**: 이번 주 방문 수 · 총 공감 · 승인 대기, 감상평 승인/숨기기/차단, 새 평가 알림.
 - **요금제 한도**: Free 100점 / Plus 2,000점(DB에서 강제).
+- **웹 스튜디오** (`/ko/studio`, `/en/studio`): 앱 없이 웹에서 가입 → 갤러리 만들기 → 전시실 관리 → 업로드(끌어다 놓기, 브라우저에서 2048px 축소·EXIF/GPS 제거) → 감상평 승인 → 설정. 앱과 같은 계정을 씁니다.
 - **웹**: 언어 자동 감지(`/@jisu` → `/ko/@jisu` 또는 `/en/@jisu`), 링크 미리보기(OG 이미지), 우클릭 저장 방지, AI 학습 크롤러 차단(`robots.txt`, `X-Robots-Tag: noai`), 이메일 매직링크 로그인.
 
 ## 아직 없는 것 (다음 단계)
@@ -77,6 +78,17 @@ supabase/tests/run.sh          # 로컬 PostgreSQL 16+에서 스키마·RLS·트
 cd app && flutter analyze && flutter test
 cd web && npm test && npm run typecheck && npm run build
 ```
+
+웹 스튜디오 브라우저 테스트(Supabase는 가짜 응답으로 대체):
+
+```bash
+cd web
+NEXT_PUBLIC_SUPABASE_URL=https://test.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=test npm run build
+npx next start -p 3200 &
+BASE_URL=http://localhost:3200 npm run e2e
+```
+
+가입 → 갤러리 만들기 → GPS가 들어 있는 사진 업로드까지 실제 Chromium에서 진행하고, 브라우저 밖으로 나가는 표시용 이미지·썸네일에 EXIF가 없는지 확인합니다.
 
 - `supabase/tests/rls_test.sql`: 비공개 작품 숨김, 익명 공감, 5건 미만 평균 비공개, 본인 작품 평가 금지, 승인제 감상평, 차단, 저장소 경로 권한, 요금제 한도 등을 실제 PostgreSQL에서 확인합니다. Supabase의 `auth`·`storage` 스키마는 `supabase_shim.sql`이 흉내 냅니다.
 - `app/test/`: 이미지 처리(크기, EXIF·GPS 제거, 회전, 워터마크), 온보딩, 업로드, 평가 패널, 라우팅을 메모리 속 가짜 저장소로 확인합니다.

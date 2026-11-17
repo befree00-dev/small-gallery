@@ -41,10 +41,14 @@ export default async function Home({
           </div>
           <button className="btn btn-primary" type="submit">{t.visit}</button>
         </form>
-        <div style={{ marginTop: 32 }}>
-          <h2 style={{ fontSize: 16, margin: '0 0 4px' }}>{t.getApp}</h2>
+        <section className="studio-card wide" style={{ marginTop: 32 }} aria-labelledby="start-title">
+          <h2 id="start-title" style={{ fontSize: 18, margin: 0 }}>{t.getApp}</h2>
           <p className="meta" style={{ margin: 0 }}>{t.getAppBody}</p>
-        </div>
+          <div className="row">
+            <a className="btn btn-primary" href={`/${locale}/studio`}>{t.startStudio}</a>
+            <a className="btn" href={`/${locale}/studio`}>{t.signInStudio}</a>
+          </div>
+        </section>
       </section>
     </main>
   );

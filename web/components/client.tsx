@@ -276,3 +276,14 @@ export function CommentBox({
     </>
   );
 }
+
+/** Shown on a gallery page only to its owner: a way back to the studio. */
+export function OwnerLink({ ownerId, locale }: { ownerId: string; locale: Locale }) {
+  const session = useSession();
+  if (!session || session.user.id !== ownerId) return null;
+  return (
+    <a className="btn" href={`/${locale}/studio`}>
+      {messages(locale).manage}
+    </a>
+  );
+}
