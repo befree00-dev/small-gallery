@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -42,9 +44,19 @@ class SupabaseGalleryRepository implements GalleryRepository {
     try {
       return await body();
     } on PostgrestException catch (e) {
+      debugPrint('[supabase] database error ${e.code}: ${e.message} ${e.details ?? ''} ${e.hint ?? ''}');
       throw _map(e.code, e.message);
     } on StorageException catch (e) {
+      debugPrint('[supabase] storage error ${e.statusCode}: ${e.message} ${e.error ?? ''}');
       throw _map(e.statusCode, e.message);
+    } on AuthException catch (e) {
+      debugPrint('[supabase] auth error ${e.statusCode}: ${e.message}');
+      throw AppException('unknown:auth:${e.message}');
+    } on AppException {
+      rethrow;
+    } catch (e, st) {
+      debugPrint('[supabase] unexpected error: $e\n$st');
+      rethrow;
     }
   }
 

@@ -24,9 +24,19 @@ run "'$pg_bin/pg_ctl' -D '$data' -o '-p $port -k /tmp -c listen_addresses=' -l '
 sleep 1
 
 psql_cmd=(psql -h /tmp -p "$port" -U postgres -v ON_ERROR_STOP=1 -q)
-"${psql_cmd[@]}" -c "create database sg_test" >/dev/null
-"${psql_cmd[@]}" -d sg_test -f "$here/supabase_shim.sql" >/dev/null
-for f in "$root"/migrations/*.sql; do
-  "${psql_cmd[@]}" -d sg_test -f "$f" >/dev/null
+
+# Run once like an older Supabase project (broad default grants) and once like
+# a newer one (no default grants), so the migrations work on both.
+for mode in default_grants no_default_grants; do
+  db="sg_$mode"
+  "${psql_cmd[@]}" -c "create database $db" >/dev/null
+  "${psql_cmd[@]}" -d "$db" -f "$here/supabase_shim.sql" >/dev/null
+  if [ "$mode" = default_grants ]; then
+    "${psql_cmd[@]}" -d "$db" -f "$here/supabase_default_grants.sql" >/dev/null
+  fi
+  for f in "$root"/migrations/*.sql; do
+    "${psql_cmd[@]}" -d "$db" -f "$f" >/dev/null
+  done
+  echo "== $mode =="
+  "${psql_cmd[@]}" -d "$db" -f "$here/rls_test.sql"
 done
-"${psql_cmd[@]}" -d sg_test -f "$here/rls_test.sql"
