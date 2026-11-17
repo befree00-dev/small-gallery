@@ -459,4 +459,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get somethingWrong => '문제가 생겼어요. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String prevWork(String title) {
+    return '이전 작품: $title';
+  }
+
+  @override
+  String nextWork(String title) {
+    return '다음 작품: $title';
+  }
+
+  @override
+  String workPosition(int index, int total) {
+    return '$index / $total';
+  }
 }

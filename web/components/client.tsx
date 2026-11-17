@@ -287,3 +287,23 @@ export function OwnerLink({ ownerId, locale }: { ownerId: string; locale: Locale
     </a>
   );
 }
+
+/** ← and → move between works, unless the visitor is typing. */
+export function ArrowKeyNav({ prevHref, nextHref }: { prevHref: string | null; nextHref: string | null }) {
+  const router = useRouter();
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const el = e.target as HTMLElement | null;
+      if (el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))) return;
+      const href = e.key === 'ArrowLeft' ? prevHref : e.key === 'ArrowRight' ? nextHref : null;
+      if (href) {
+        e.preventDefault();
+        router.push(href);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [prevHref, nextHref, router]);
+  return null;
+}

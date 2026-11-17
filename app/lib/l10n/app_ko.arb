@@ -45,7 +45,13 @@
   "roomTitle": "전시실 이름",
   "roomStatement": "전시 서문",
   "artworksCount": "작품 {count}점",
-  "@artworksCount": {"placeholders": {"count": {"type": "int"}}},
+  "@artworksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "viewAsVisitor": "방문자 시점으로 보기",
   "shareGallery": "갤러리 링크 복사",
   "linkCopied": "링크를 복사했어요",
@@ -87,7 +93,16 @@
   "acceptRatings": "방문자 평가 받기",
   "hangArtwork": "전시실에 걸기",
   "uploading": "{total}장 중 {done}장 올리는 중",
-  "@uploading": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
+  "@uploading": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "uploadDone": "작품을 걸었어요",
   "fileTooLarge": "50MB가 넘는 파일은 올릴 수 없어요",
   "unsupportedImage": "열 수 없는 이미지예요",
@@ -104,9 +119,21 @@
   "blockAuthor": "작성자 차단",
   "report": "신고",
   "notifRating": "새 평가 · {title}",
-  "@notifRating": {"placeholders": {"title": {"type": "String"}}},
+  "@notifRating": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "notifComment": "새 감상평 · {title}",
-  "@notifComment": {"placeholders": {"title": {"type": "String"}}},
+  "@notifComment": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "notifGuestbook": "방명록에 새 글",
   "notifPending": "승인을 기다리는 감상평",
   "noReactions": "아직 반응이 없어요. 갤러리 링크를 공유해 보세요.",
@@ -122,9 +149,30 @@
   "language": "언어",
   "signOut": "로그아웃",
   "planUsage": "{plan} 플랜 · {count} / {limit}점",
-  "@planUsage": {"placeholders": {"plan": {"type": "String"}, "count": {"type": "int"}, "limit": {"type": "int"}}},
+  "@planUsage": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "galleryStats": "작품 {artworks} · 전시실 {rooms}",
-  "@galleryStats": {"placeholders": {"artworks": {"type": "int"}, "rooms": {"type": "int"}}},
+  "@galleryStats": {
+    "placeholders": {
+      "artworks": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
   "guestbook": "방명록",
   "writeGuestbook": "방명록 남기기",
   "galleryNotFound": "갤러리를 찾을 수 없어요",
@@ -140,7 +188,13 @@
   "ratingSent": "평가를 작가에게 전달했어요",
   "ratingNote": "평가가 5건 이상 모이면 평균이 공개돼요. 작가에게는 바로 전달됩니다.",
   "ratingAverages": "평균 평점 · {count}명 참여",
-  "@ratingAverages": {"placeholders": {"count": {"type": "int"}}},
+  "@ratingAverages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "signInToReact": "로그인하면 평가와 감상평을 남길 수 있어요",
   "writeComment": "감상평 남기기",
   "commentPending": "작가가 승인하면 공개돼요",
@@ -148,9 +202,45 @@
   "ratingsOff": "작가가 평가를 받지 않는 작품이에요",
   "ownArtwork": "내 작품은 평가할 수 없어요",
   "starLabel": "{criterion} {n}점",
-  "@starLabel": {"placeholders": {"criterion": {"type": "String"}, "n": {"type": "int"}}},
+  "@starLabel": {
+    "placeholders": {
+      "criterion": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "send": "보내기",
   "loadFailed": "불러오지 못했어요. 다시 시도해 주세요.",
   "retry": "다시 시도",
-  "somethingWrong": "문제가 생겼어요. 잠시 후 다시 시도해 주세요."
+  "somethingWrong": "문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+  "prevWork": "이전 작품: {title}",
+  "@prevWork": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "nextWork": "다음 작품: {title}",
+  "@nextWork": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "workPosition": "{index} / {total}",
+  "@workPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

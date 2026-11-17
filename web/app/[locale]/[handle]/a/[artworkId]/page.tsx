@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { LikeButton, ProtectedImage, RatingForm, ViewTracker } from '@/components/client';
+import { ArrowKeyNav, LikeButton, ProtectedImage, RatingForm, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
-import { average, getArtwork, getComments, getGallery, getRatingStats } from '@/lib/data';
+import { average, getArtwork, getArtworks, getComments, getGallery, getRatingStats, getRooms, groupByRoom, neighbors } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
 import { imageUrl } from '@/lib/supabase';
 import { criteria, PUBLIC_RATING_THRESHOLD } from '@/lib/types';
@@ -43,7 +43,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ArtworkPage({ params }: { params: Params }) {
   const { locale, gallery, artwork: a } = await load(params);
   const t = messages(locale);
-  const [stats, comments] = await Promise.all([getRatingStats(a.id), getComments(gallery.id, a.id)]);
+  const [stats, comments, rooms, works] = await Promise.all([
+    getRatingStats(a.id),
+    getComments(gallery.id, a.id),
+    getRooms(gallery.id),
+    getArtworks(gallery.id),
+  ]);
+  // The gallery's hanging order: rooms in order, works in order within each room.
+  const sequence = groupByRoom(rooms, works).flatMap((g) => g.artworks);
+  const { index, prev, next } = neighbors(sequence, a.id);
+  const room = rooms.find((r) => r.id === a.room_id);
+  const hrefOf = (w: { id: string } | null) => (w ? `/${locale}/@${gallery.handle}/a/${w.id}` : null);
   const title = pick(a.title, a.title_en, locale);
   const note = pick(a.note, a.note_en, locale);
   const details = [gallery.profiles?.display_name, a.year, a.medium, a.size_text].filter(Boolean).join(' · ');
@@ -61,9 +71,34 @@ export default async function ArtworkPage({ params }: { params: Params }) {
           <span className="address">{pick(gallery.title, gallery.title_en, locale)}</span>
         </header>
 
+        <ArrowKeyNav prevHref={hrefOf(prev)} nextHref={hrefOf(next)} />
         <div className="stage">
+          {prev ? (
+            <Link className="nav-arrow" href={hrefOf(prev)!} rel="prev" aria-label={t.prevWork(pick(prev.title, prev.title_en, locale))}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+            </Link>
+          ) : (
+            <span className="nav-arrow" aria-hidden="true" data-disabled="true">
+              <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+            </span>
+          )}
           <ProtectedImage src={imageUrl(a.image_path)} alt={title} width={a.width} height={a.height} priority />
+          {next ? (
+            <Link className="nav-arrow" href={hrefOf(next)!} rel="next" aria-label={t.nextWork(pick(next.title, next.title_en, locale))}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+            </Link>
+          ) : (
+            <span className="nav-arrow" aria-hidden="true" data-disabled="true">
+              <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+            </span>
+          )}
         </div>
+        {index >= 0 && (
+          <p className="position meta">
+            {t.position(index + 1, sequence.length)}
+            {room && ` · ${pick(room.title, room.title_en, locale)}`}
+          </p>
+        )}
 
         <div className="info">
           <h1>{title}</h1>

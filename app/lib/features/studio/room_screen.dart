@@ -46,7 +46,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     final room = _room!;
     if (_title.text.trim().isEmpty) return;
     try {
-      await ref.read(repositoryProvider).updateRoom(
+      await ref
+          .read(repositoryProvider)
+          .updateRoom(
             room.copyWith(title: _title.text.trim(), statement: _statement.text.trim(), visibility: _visibility),
           );
       ref.invalidate(roomsProvider(gallery.id));
@@ -125,7 +127,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                           contentPadding: const EdgeInsets.fromLTRB(8, 4, 40, 4),
                           leading: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
-                            child: SizedBox.square(dimension: 56, child: ArtworkImage(path: a.thumbPath, semanticLabel: a.title)),
+                            child: SizedBox.square(
+                              dimension: 56,
+                              child: ArtworkImage(path: a.thumbPath, semanticLabel: a.title),
+                            ),
                           ),
                           title: Text(a.title),
                           subtitle: Text(
@@ -156,31 +161,36 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   Widget _header(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        TextField(controller: _title, maxLength: 60, decoration: InputDecoration(labelText: l10n.roomTitle)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _statement,
-          minLines: 2,
-          maxLines: 5,
-          maxLength: 1000,
-          decoration: InputDecoration(labelText: l10n.roomStatement),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<Audience>(
-          initialValue: _visibility,
-          decoration: InputDecoration(labelText: l10n.visibility),
-          items: [
-            for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v))),
-          ],
-          onChanged: (v) => setState(() => _visibility = v!),
-        ),
-        const SizedBox(height: 20),
-        if ((_order ?? const []).isEmpty)
-          Text(l10n.emptyRoom, style: const TextStyle(color: Palette.muted))
-        else
-          Text(l10n.dragToReorder, style: const TextStyle(color: Palette.muted, fontSize: 12)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: _title,
+            maxLength: 60,
+            decoration: InputDecoration(labelText: l10n.roomTitle),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _statement,
+            minLines: 2,
+            maxLines: 5,
+            maxLength: 1000,
+            decoration: InputDecoration(labelText: l10n.roomStatement),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<Audience>(
+            initialValue: _visibility,
+            decoration: InputDecoration(labelText: l10n.visibility),
+            items: [for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v)))],
+            onChanged: (v) => setState(() => _visibility = v!),
+          ),
+          const SizedBox(height: 20),
+          if ((_order ?? const []).isEmpty)
+            Text(l10n.emptyRoom, style: const TextStyle(color: Palette.muted))
+          else
+            Text(l10n.dragToReorder, style: const TextStyle(color: Palette.muted, fontSize: 12)),
+        ],
+      ),
     );
   }
 }

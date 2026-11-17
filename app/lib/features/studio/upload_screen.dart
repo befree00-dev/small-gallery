@@ -12,11 +12,15 @@ import '../../theme.dart';
 import '../../ui/common.dart';
 
 /// Opens the platform photo picker. Overridden in tests.
-final pickImagesProvider = Provider<Future<List<XFile>> Function()>((ref) => () => ImagePicker().pickMultiImage());
+final pickImagesProvider = Provider<Future<List<XFile>> Function()>(
+  (ref) =>
+      () => ImagePicker().pickMultiImage(),
+);
 
 /// Desktop drag-and-drop needs a native window; tests and mobile skip it.
 final enableDropTargetProvider = Provider<bool>(
-  (ref) => !kIsWeb && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.macOS),
+  (ref) =>
+      !kIsWeb && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.macOS),
 );
 
 /// One picked photo and the details written for it.
@@ -93,9 +97,9 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
   Future<void> _pick() async => _add(await ref.read(pickImagesProvider)());
 
   void _remove(int i) => setState(() {
-        _items.removeAt(i).dispose();
-        _selected = _selected.clamp(0, (_items.length - 1).clamp(0, 1 << 30));
-      });
+    _items.removeAt(i).dispose();
+    _selected = _selected.clamp(0, (_items.length - 1).clamp(0, 1 << 30));
+  });
 
   Future<void> _submit(Gallery gallery, List<Room> rooms) async {
     final l10n = context.l10n;
@@ -174,10 +178,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
       children: [
         _dropZone(l10n),
-        if (_items.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          _thumbnails(l10n),
-        ],
+        if (_items.isNotEmpty) ...[const SizedBox(height: 12), _thumbnails(l10n)],
         const SizedBox(height: 8),
         if (uploading) ...[
           Text(l10n.uploading(_done!, total), style: const TextStyle(fontSize: 12, color: Palette.muted)),
@@ -208,7 +209,9 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.uploadTitle)),
-      body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: body)),
+      body: Center(
+        child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: body),
+      ),
       bottomNavigationBar: _items.isEmpty
           ? null
           : SafeArea(
@@ -235,13 +238,18 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: _dragging ? Palette.accent : const Color(0xFFB9B4A8), width: 1.5),
         ),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Icon(Icons.add_photo_alternate_outlined, color: Palette.muted),
-          const SizedBox(height: 6),
-          Text(desktop ? '${l10n.dropHere} · ${l10n.pickPhotos}' : l10n.pickPhotos,
-              style: const TextStyle(fontWeight: FontWeight.w500)),
-          Text(l10n.dropFormats, style: const TextStyle(fontSize: 12, color: Palette.muted)),
-        ]),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add_photo_alternate_outlined, color: Palette.muted),
+            const SizedBox(height: 6),
+            Text(
+              desktop ? '${l10n.dropHere} · ${l10n.pickPhotos}' : l10n.pickPhotos,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            Text(l10n.dropFormats, style: const TextStyle(fontSize: 12, color: Palette.muted)),
+          ],
+        ),
       ),
     );
   }
@@ -253,58 +261,85 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
         scrollDirection: Axis.horizontal,
         itemCount: _items.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, i) => Stack(children: [
-          GestureDetector(
-            onTap: () => setState(() => _selected = i),
-            child: Container(
-              width: 76,
-              height: 76,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: i == _selected ? Palette.accent : Colors.transparent, width: 2),
+        itemBuilder: (context, i) => Stack(
+          children: [
+            GestureDetector(
+              onTap: () => setState(() => _selected = i),
+              child: Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: i == _selected ? Palette.accent : Colors.transparent, width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.memory(_items[i].bytes, fit: BoxFit.cover, cacheWidth: 200, semanticLabel: _items[i].name),
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Image.memory(_items[i].bytes, fit: BoxFit.cover, cacheWidth: 200, semanticLabel: _items[i].name),
             ),
-          ),
-          if (_done == null)
-            // Kept to the corner so tapping the photo selects it rather than removing it.
-            Positioned(
-              right: 2,
-              top: 2,
-              child: Tooltip(
-                message: l10n.delete,
-                child: Semantics(
-                  button: true,
-                  label: '${l10n.delete} ${_items[i].name}',
-                  child: InkWell(
-                    onTap: () => _remove(i),
-                    customBorder: const CircleBorder(),
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: const BoxDecoration(color: Color(0xCC1D1C1A), shape: BoxShape.circle),
-                      child: const Icon(Icons.close, size: 14, color: Colors.white),
+            if (_done == null)
+              // Kept to the corner so tapping the photo selects it rather than removing it.
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Tooltip(
+                  message: l10n.delete,
+                  child: Semantics(
+                    button: true,
+                    label: '${l10n.delete} ${_items[i].name}',
+                    child: InkWell(
+                      onTap: () => _remove(i),
+                      customBorder: const CircleBorder(),
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        decoration: const BoxDecoration(color: Color(0xCC1D1C1A), shape: BoxShape.circle),
+                        child: const Icon(Icons.close, size: 14, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ]),
+          ],
+        ),
       ),
     );
   }
 
   Widget _perImageFields(AppLocalizations l10n, _Pending p) {
-    return Column(key: ObjectKey(p), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      TextField(controller: p.title, maxLength: 80, decoration: InputDecoration(labelText: l10n.title)),
-      TextField(controller: p.titleEn, maxLength: 80, decoration: InputDecoration(labelText: l10n.titleEn)),
-      TextField(controller: p.size, decoration: InputDecoration(labelText: l10n.size, hintText: '32×24cm')),
-      const SizedBox(height: 12),
-      TextField(controller: p.note, minLines: 2, maxLines: 4, decoration: InputDecoration(labelText: l10n.artistNote)),
-      const SizedBox(height: 12),
-      TextField(controller: p.noteEn, minLines: 1, maxLines: 4, decoration: InputDecoration(labelText: l10n.artistNoteEn)),
-    ]);
+    return Column(
+      key: ObjectKey(p),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: p.title,
+          maxLength: 80,
+          decoration: InputDecoration(labelText: l10n.title),
+        ),
+        TextField(
+          controller: p.titleEn,
+          maxLength: 80,
+          decoration: InputDecoration(labelText: l10n.titleEn),
+        ),
+        TextField(
+          controller: p.size,
+          decoration: InputDecoration(labelText: l10n.size, hintText: '32×24cm'),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: p.note,
+          minLines: 2,
+          maxLines: 4,
+          decoration: InputDecoration(labelText: l10n.artistNote),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: p.noteEn,
+          minLines: 1,
+          maxLines: 4,
+          decoration: InputDecoration(labelText: l10n.artistNoteEn),
+        ),
+      ],
+    );
   }
 
   Widget _sharedFields(AppLocalizations l10n, List<Room> rooms) {
@@ -316,35 +351,50 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       l10n.mediumDigital: l10n.mediumDigital,
       l10n.mediumOther: l10n.mediumOther,
     };
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      TextField(controller: _year, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.year)),
-      const SizedBox(height: 16),
-      Text(l10n.medium, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-      const SizedBox(height: 8),
-      Wrap(spacing: 6, runSpacing: 6, children: [
-        for (final m in media.keys)
-          ChoiceChip(label: Text(m), selected: _medium == m, onSelected: (s) => setState(() => _medium = s ? m : '')),
-      ]),
-      const SizedBox(height: 16),
-      DropdownButtonFormField<String>(
-        initialValue: _roomId ?? rooms.firstOrNull?.id,
-        decoration: InputDecoration(labelText: l10n.room),
-        items: [for (final r in rooms) DropdownMenuItem(value: r.id, child: Text(r.title))],
-        onChanged: (v) => setState(() => _roomId = v),
-      ),
-      const SizedBox(height: 8),
-      SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(l10n.watermark),
-        value: _watermark,
-        onChanged: (v) => setState(() => _watermark = v),
-      ),
-      SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(l10n.acceptRatings),
-        value: _ratings,
-        onChanged: (v) => setState(() => _ratings = v),
-      ),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: _year,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: l10n.year),
+        ),
+        const SizedBox(height: 16),
+        Text(l10n.medium, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final m in media.keys)
+              ChoiceChip(
+                label: Text(m),
+                selected: _medium == m,
+                onSelected: (s) => setState(() => _medium = s ? m : ''),
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          initialValue: _roomId ?? rooms.firstOrNull?.id,
+          decoration: InputDecoration(labelText: l10n.room),
+          items: [for (final r in rooms) DropdownMenuItem(value: r.id, child: Text(r.title))],
+          onChanged: (v) => setState(() => _roomId = v),
+        ),
+        const SizedBox(height: 8),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.watermark),
+          value: _watermark,
+          onChanged: (v) => setState(() => _watermark = v),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.acceptRatings),
+          value: _ratings,
+          onChanged: (v) => setState(() => _ratings = v),
+        ),
+      ],
+    );
   }
 }

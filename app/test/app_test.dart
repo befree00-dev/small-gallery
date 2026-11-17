@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -11,10 +12,9 @@ import 'fakes.dart';
 Future<ProviderContainer> pumpApp(WidgetTester tester, FakeRepository repo, {String locale = 'ko'}) async {
   SharedPreferences.setMockInitialValues({'app_locale': locale});
   final prefs = await SharedPreferences.getInstance();
-  final container = ProviderContainer(overrides: [
-    repositoryProvider.overrideWithValue(repo),
-    prefsProvider.overrideWithValue(prefs),
-  ]);
+  final container = ProviderContainer(
+    overrides: [repositoryProvider.overrideWithValue(repo), prefsProvider.overrideWithValue(prefs)],
+  );
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const SmallGalleryApp()));
   await tester.pumpAndSettle();
@@ -90,6 +90,35 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('누구나 자신만의 작은 갤러리를 가질 수 있는 곳'), findsOneWidget);
   });
+
+  testWidgets('visitors step through works with buttons and arrow keys, across rooms', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final repo = FakeRepository();
+    // Room order then sort order; stored out of order on purpose.
+    repo.rooms_.add(const Room(id: 'r2', galleryId: 'g1', title: '작은 정물', sortOrder: 1));
+    repo.artworks_.insertAll(0, [_work('a3', 'r2', 0, '창가의 레몬'), _work('a2', 'r1', 1, '비 갠 골목')]);
+    final container = await pumpApp(tester, repo);
+    container.read(routerProvider).go('/g/jisu/a/a1');
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 3 · 봄의 산책'), findsOneWidget);
+    expect(find.byTooltip('이전 작품: 4월, 개천 옆 벚나무'), findsNothing);
+
+    await tester.tap(find.byTooltip('다음 작품: 비 갠 골목'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 3 · 봄의 산책'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 3 · 작은 정물'), findsOneWidget, reason: '→ crosses into the next room');
+    final nextButtons = tester.widgetList<IconButton>(find.widgetWithIcon(IconButton, Icons.chevron_right));
+    expect(nextButtons.single.onPressed, isNull, reason: 'no next on the last work');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 3 · 봄의 산책'), findsOneWidget);
+  });
 }
 
 class _FailingGalleryRepository extends FakeRepository {
@@ -101,3 +130,15 @@ class _FailingGalleryRepository extends FakeRepository {
     throw const AppException('unknown:42501:permission denied');
   }
 }
+
+Artwork _work(String id, String roomId, int order, String title) => Artwork(
+  id: id,
+  galleryId: 'g1',
+  roomId: roomId,
+  title: title,
+  imagePath: 'p/$id.jpg',
+  thumbPath: 't/$id.jpg',
+  width: 1600,
+  height: 1200,
+  sortOrder: order,
+);

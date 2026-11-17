@@ -45,12 +45,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (_title.text.trim().isEmpty) return;
     setState(() => _busy = true);
     try {
-      await ref.read(repositoryProvider).updateGallery(_g.copyWith(
-            title: _title.text.trim(),
-            titleEn: _titleEn.text.trim(),
-            bio: _bio.text.trim(),
-            bioEn: _bioEn.text.trim(),
-          ));
+      await ref
+          .read(repositoryProvider)
+          .updateGallery(
+            _g.copyWith(
+              title: _title.text.trim(),
+              titleEn: _titleEn.text.trim(),
+              bio: _bio.text.trim(),
+              bioEn: _bioEn.text.trim(),
+            ),
+          );
       ref.invalidate(myGalleryProvider);
       if (mounted) context.toast(l10n.saved);
     } catch (e) {
@@ -83,8 +87,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               Text(l10n.galleryInfo, style: const TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
-              TextField(controller: _title, maxLength: 60, decoration: InputDecoration(labelText: l10n.galleryTitle)),
-              TextField(controller: _titleEn, maxLength: 60, decoration: InputDecoration(labelText: l10n.titleEn)),
+              TextField(
+                controller: _title,
+                maxLength: 60,
+                decoration: InputDecoration(labelText: l10n.galleryTitle),
+              ),
+              TextField(
+                controller: _titleEn,
+                maxLength: 60,
+                decoration: InputDecoration(labelText: l10n.titleEn),
+              ),
               TextField(
                 controller: _bio,
                 minLines: 2,
@@ -114,7 +126,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               DropdownButtonFormField<Audience>(
                 initialValue: _g.visibility,
                 decoration: InputDecoration(labelText: l10n.visibility),
-                items: [for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v)))],
+                items: [
+                  for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v))),
+                ],
                 onChanged: (v) => setState(() => _g = _g.copyWith(visibility: v)),
               ),
               const SizedBox(height: 12),

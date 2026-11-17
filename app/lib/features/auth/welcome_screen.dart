@@ -82,7 +82,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   children: [
                     const _LanguageSwitch(),
                     const SizedBox(height: 24),
-                    Text('Small Gallery', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Palette.muted)),
+                    Text(
+                      'Small Gallery',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Palette.muted),
+                    ),
                     const SizedBox(height: 8),
                     Text(l10n.welcomeHeadline, style: serifTitle.copyWith(fontSize: 26, height: 1.3)),
                     const SizedBox(height: 8),
@@ -108,7 +111,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _password,
-                      decoration: InputDecoration(labelText: l10n.password, helperText: _signingUp ? l10n.passwordRule : null),
+                      decoration: InputDecoration(
+                        labelText: l10n.password,
+                        helperText: _signingUp ? l10n.passwordRule : null,
+                      ),
                       obscureText: true,
                       autofillHints: [_signingUp ? AutofillHints.newPassword : AutofillHints.password],
                       onFieldSubmitted: (_) => _submit(),
@@ -145,17 +151,19 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     const SizedBox(height: 24),
                     Text(l10n.visitByHandle, style: const TextStyle(fontWeight: FontWeight.w500)),
                     const SizedBox(height: 8),
-                    Row(children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _handle,
-                          decoration: InputDecoration(hintText: l10n.handleHint, prefixText: '@'),
-                          onSubmitted: (_) => _visit(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _handle,
+                            decoration: InputDecoration(hintText: l10n.handleHint, prefixText: '@'),
+                            onSubmitted: (_) => _visit(),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      OutlinedButton(onPressed: _visit, child: Text(l10n.go)),
-                    ]),
+                        const SizedBox(width: 8),
+                        OutlinedButton(onPressed: _visit, child: Text(l10n.go)),
+                      ],
+                    ),
                   ],
                 ),
               ),

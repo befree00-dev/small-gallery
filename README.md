@@ -90,6 +90,17 @@ BASE_URL=http://localhost:3200 npm run e2e
 
 가입 → 갤러리 만들기 → GPS가 들어 있는 사진 업로드까지 실제 Chromium에서 진행하고, 브라우저 밖으로 나가는 표시용 이미지·썸네일에 EXIF가 없는지 확인합니다.
 
+방문자 화면 브라우저 테스트(가짜 Supabase 서버를 `localhost:54321`에 띄움):
+
+```bash
+cd web
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=test npm run build
+npx next start -p 3201 &
+BASE_URL=http://localhost:3201 npm run e2e:visitor
+```
+
+작품 보기에서 이전·다음 버튼과 ←/→ 키로 전시실을 넘어 이동하는지, 입력칸에서는 키가 페이지를 넘기지 않는지 확인합니다.
+
 - `supabase/tests/rls_test.sql`: 비공개 작품 숨김, 익명 공감, 5건 미만 평균 비공개, 본인 작품 평가 금지, 승인제 감상평, 차단, 저장소 경로 권한, 요금제 한도 등을 실제 PostgreSQL에서 확인합니다. Supabase의 `auth`·`storage` 스키마는 `supabase_shim.sql`이 흉내 냅니다.
 - `app/test/`: 이미지 처리(크기, EXIF·GPS 제거, 회전, 워터마크), 온보딩, 업로드, 평가 패널, 라우팅을 메모리 속 가짜 저장소로 확인합니다.
 - `web/tests/`: 언어 감지, 주소 해석, 리다이렉트 규칙, 번역 키 누락.

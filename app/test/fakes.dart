@@ -14,13 +14,7 @@ import 'package:small_gallery/theme.dart';
 const artistId = 'artist-1';
 const visitorId = 'visitor-1';
 
-const testGallery = Gallery(
-  id: 'g1',
-  ownerId: artistId,
-  handle: 'jisu',
-  title: '지수의 작은 정원',
-  ownerName: '김지수',
-);
+const testGallery = Gallery(id: 'g1', ownerId: artistId, handle: 'jisu', title: '지수의 작은 정원', ownerName: '김지수');
 
 const testRoom = Room(id: 'r1', galleryId: 'g1', title: '봄의 산책', artworkCount: 1);
 
@@ -38,7 +32,8 @@ const testArtwork = Artwork(
 
 /// In-memory stand-in for Supabase. Records what screens ask it to do.
 class FakeRepository implements GalleryRepository {
-  FakeRepository({String? userId, this.gallery = testGallery, this.stats}) : _userId = userId; // ignore: prefer_initializing_formals
+  FakeRepository({String? userId, this.gallery = testGallery, this.stats})
+    : _userId = userId; // ignore: prefer_initializing_formals
 
   String? _userId;
   final _users = StreamController<String?>.broadcast();
@@ -69,7 +64,12 @@ class FakeRepository implements GalleryRepository {
   Future<void> signIn({required String email, required String password}) async => signInAs(visitorId);
 
   @override
-  Future<bool> signUp({required String email, required String password, required String displayName, required String locale}) async {
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String displayName,
+    required String locale,
+  }) async {
     signInAs(visitorId);
     return true;
   }
@@ -129,7 +129,11 @@ class FakeRepository implements GalleryRepository {
   Future<int> artworkCount(String galleryId) async => artworks_.length;
 
   @override
-  Future<Artwork> uploadArtwork({required Gallery gallery, required ArtworkDraft draft, required Uint8List imageBytes}) async {
+  Future<Artwork> uploadArtwork({
+    required Gallery gallery,
+    required ArtworkDraft draft,
+    required Uint8List imageBytes,
+  }) async {
     if (uploadError != null) throw uploadError!;
     uploads.add(draft);
     return testArtwork;
@@ -189,15 +193,15 @@ class FakeRepository implements GalleryRepository {
 
   @override
   Future<Comment> addComment({required String galleryId, String? artworkId, required String body}) async => Comment(
-        id: 'c1',
-        galleryId: galleryId,
-        artworkId: artworkId,
-        authorId: _userId!,
-        authorName: 'Tester',
-        body: body,
-        status: CommentStatus.pending,
-        createdAt: DateTime(2026),
-      );
+    id: 'c1',
+    galleryId: galleryId,
+    artworkId: artworkId,
+    authorId: _userId!,
+    authorName: 'Tester',
+    body: body,
+    status: CommentStatus.pending,
+    createdAt: DateTime(2026),
+  );
 
   @override
   Future<void> report({required String targetType, required String targetId, required String reason}) async {}
@@ -219,24 +223,23 @@ Future<void> pumpWithApp(
 }) async {
   SharedPreferences.setMockInitialValues({'app_locale': locale.languageCode});
   final prefs = await SharedPreferences.getInstance();
-  await tester.pumpWidget(ProviderScope(
-    overrides: [
-      repositoryProvider.overrideWithValue(repo),
-      prefsProvider.overrideWithValue(prefs),
-      ...overrides.cast(),
-    ],
-    child: Consumer(
-      builder: (context, ref, _) => MaterialApp(
-        theme: buildTheme(),
-        locale: ref.watch(localeProvider),
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          ...GlobalMaterialLocalizations.delegates,
-        ],
-        home: child,
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        repositoryProvider.overrideWithValue(repo),
+        prefsProvider.overrideWithValue(prefs),
+        ...overrides.cast(),
+      ],
+      child: Consumer(
+        builder: (context, ref, _) => MaterialApp(
+          theme: buildTheme(),
+          locale: ref.watch(localeProvider),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
+          home: child,
+        ),
       ),
     ),
-  ));
+  );
   await tester.pumpAndSettle();
 }

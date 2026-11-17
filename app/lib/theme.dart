@@ -41,9 +41,14 @@ ThemeData buildTheme() {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Palette.surface,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Palette.line)),
-      enabledBorder:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFD6D2C8))),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Palette.line),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFD6D2C8)),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
@@ -63,17 +68,29 @@ ThemeData buildTheme() {
       color: Palette.surface,
       elevation: 0,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Palette.line)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Palette.line),
+      ),
     ),
   );
 }
 
 /// The visitor-facing colors of each gallery theme.
 ({Color ground, Color ink, Color muted, Color frame}) galleryColors(GalleryTheme theme) => switch (theme) {
-      GalleryTheme.white => (ground: Palette.ground, ink: Palette.ink, muted: Palette.muted, frame: Palette.surface),
-      GalleryTheme.dark => (ground: Palette.darkGround, ink: Palette.darkInk, muted: Palette.darkMuted, frame: Palette.darkSurface),
-      GalleryTheme.wood =>
-        (ground: const Color(0xFFF3EDE3), ink: Palette.ink, muted: const Color(0xFF5E5448), frame: const Color(0xFF8A6A4A)),
-    };
+  GalleryTheme.white => (ground: Palette.ground, ink: Palette.ink, muted: Palette.muted, frame: Palette.surface),
+  GalleryTheme.dark => (
+    ground: Palette.darkGround,
+    ink: Palette.darkInk,
+    muted: Palette.darkMuted,
+    frame: Palette.darkSurface,
+  ),
+  GalleryTheme.wood => (
+    ground: const Color(0xFFF3EDE3),
+    ink: Palette.ink,
+    muted: const Color(0xFF5E5448),
+    frame: const Color(0xFF8A6A4A),
+  ),
+};
 
 const serifTitle = TextStyle(fontFamily: 'serif', fontWeight: FontWeight.w600, letterSpacing: -0.4);

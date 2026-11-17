@@ -70,7 +70,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'a/:artworkId',
-            builder: (_, s) => ArtworkScreen(handle: s.pathParameters['handle']!, artworkId: s.pathParameters['artworkId']!),
+            builder: (_, s) =>
+                ArtworkScreen(handle: s.pathParameters['handle']!, artworkId: s.pathParameters['artworkId']!),
           ),
         ],
       ),
@@ -91,10 +92,7 @@ class SmallGalleryApp extends ConsumerWidget {
       theme: buildTheme(),
       locale: ref.watch(localeProvider),
       supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        ...GlobalMaterialLocalizations.delegates,
-      ],
+      localizationsDelegates: const [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
       routerConfig: ref.watch(routerProvider),
     );
   }

@@ -31,10 +31,9 @@ class _RatingPanelState extends ConsumerState<RatingPanel> {
     final s = _scores!;
     setState(() => _busy = true);
     try {
-      await ref.read(repositoryProvider).rate(
-            widget.artwork.id,
-            Rating(composition: s[0], color: s[1], technique: s[2], emotion: s[3]),
-          );
+      await ref
+          .read(repositoryProvider)
+          .rate(widget.artwork.id, Rating(composition: s[0], color: s[1], technique: s[2], emotion: s[3]));
       ref.invalidate(ratingStatsProvider(widget.artwork.id));
       ref.invalidate(myRatingProvider(widget.artwork.id));
       setState(() => _sent = true);
@@ -54,11 +53,13 @@ class _RatingPanelState extends ConsumerState<RatingPanel> {
     final isOwner = uid != null && uid == widget.gallery.ownerId;
     final open = widget.gallery.ratingEnabled && widget.artwork.ratingEnabled;
 
-    Widget note(String text) =>
-        Text(text, style: const TextStyle(fontSize: 12, height: 1.5, color: Palette.darkMuted));
+    Widget note(String text) => Text(text, style: const TextStyle(fontSize: 12, height: 1.5, color: Palette.darkMuted));
 
     final children = <Widget>[
-      Text(l10n.rateThis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Palette.darkInk)),
+      Text(
+        l10n.rateThis,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Palette.darkInk),
+      ),
       const SizedBox(height: 6),
     ];
 
@@ -80,21 +81,26 @@ class _RatingPanelState extends ConsumerState<RatingPanel> {
         note(l10n.signInToReact),
         const SizedBox(height: 8),
         OutlinedButton(
-          style: OutlinedButton.styleFrom(foregroundColor: Palette.darkInk, side: const BorderSide(color: Color(0xFF4A4843))),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Palette.darkInk,
+            side: const BorderSide(color: Color(0xFF4A4843)),
+          ),
           onPressed: () => context.push('/welcome'),
           child: Text(l10n.signIn),
         ),
       ]);
     } else if (_sent) {
-      children.add(Semantics(
-        liveRegion: true,
-        child: Container(
-          height: 48,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: const Color(0xFF2A2926), borderRadius: BorderRadius.circular(10)),
-          child: Text(l10n.ratingSent, style: const TextStyle(color: Palette.darkInk)),
+      children.add(
+        Semantics(
+          liveRegion: true,
+          child: Container(
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: const Color(0xFF2A2926), borderRadius: BorderRadius.circular(10)),
+            child: Text(l10n.ratingSent, style: const TextStyle(color: Palette.darkInk)),
+          ),
         ),
-      ));
+      );
     } else {
       final mine = ref.watch(myRatingProvider(widget.artwork.id));
       if (mine.isLoading) return const SizedBox(height: 120);
@@ -103,11 +109,9 @@ class _RatingPanelState extends ConsumerState<RatingPanel> {
           ? [0, 0, 0, 0]
           : [existing.composition, existing.color, existing.technique, existing.emotion];
       for (var i = 0; i < criteria.length; i++) {
-        children.add(_StarRow(
-          label: criteria[i],
-          value: _scores![i],
-          onChanged: (v) => setState(() => _scores![i] = v),
-        ));
+        children.add(
+          _StarRow(label: criteria[i], value: _scores![i], onChanged: (v) => setState(() => _scores![i] = v)),
+        );
       }
       children.addAll([
         const SizedBox(height: 4),
@@ -149,19 +153,24 @@ class _StarRow extends StatelessWidget {
     final l10n = context.l10n;
     return SizedBox(
       height: 44,
-      child: Row(children: [
-        SizedBox(width: 72, child: Text(label, style: const TextStyle(color: Color(0xFFD6D3CC)))),
-        for (var n = 1; n <= 5; n++)
-          IconButton(
-            tooltip: l10n.starLabel(label, n),
-            isSelected: n <= value,
-            onPressed: () => onChanged(n),
-            icon: const Icon(Icons.star_border, color: Color(0xFF6E6B66)),
-            selectedIcon: const Icon(Icons.star, color: Palette.darkAccent),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(label, style: const TextStyle(color: Color(0xFFD6D3CC))),
           ),
-        const Spacer(),
-        Text(value == 0 ? '—' : '$value / 5', style: const TextStyle(fontSize: 13, color: Palette.darkMuted)),
-      ]),
+          for (var n = 1; n <= 5; n++)
+            IconButton(
+              tooltip: l10n.starLabel(label, n),
+              isSelected: n <= value,
+              onPressed: () => onChanged(n),
+              icon: const Icon(Icons.star_border, color: Color(0xFF6E6B66)),
+              selectedIcon: const Icon(Icons.star, color: Palette.darkAccent),
+            ),
+          const Spacer(),
+          Text(value == 0 ? '—' : '$value / 5', style: const TextStyle(fontSize: 13, color: Palette.darkMuted)),
+        ],
+      ),
     );
   }
 }
@@ -174,30 +183,40 @@ class _Averages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      for (var i = 0; i < labels.length; i++)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(children: [
-            SizedBox(width: 72, child: Text(labels[i], style: const TextStyle(fontSize: 13, color: Color(0xFFD6D3CC)))),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  value: values[i] / 5,
-                  minHeight: 6,
-                  color: Palette.darkAccent,
-                  backgroundColor: const Color(0xFF2E2D2A),
+    return Column(
+      children: [
+        for (var i = 0; i < labels.length; i++)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 72,
+                  child: Text(labels[i], style: const TextStyle(fontSize: 13, color: Color(0xFFD6D3CC))),
                 ),
-              ),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: values[i] / 5,
+                      minHeight: 6,
+                      color: Palette.darkAccent,
+                      backgroundColor: const Color(0xFF2E2D2A),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    values[i].toStringAsFixed(1),
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(fontSize: 13, color: Palette.darkMuted),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(
-              width: 40,
-              child: Text(values[i].toStringAsFixed(1),
-                  textAlign: TextAlign.end, style: const TextStyle(fontSize: 13, color: Palette.darkMuted)),
-            ),
-          ]),
-        ),
-    ]);
+          ),
+      ],
+    );
   }
 }

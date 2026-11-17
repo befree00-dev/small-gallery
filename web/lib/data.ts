@@ -64,14 +64,22 @@ export async function getComments(galleryId: string, artworkId: string | null): 
   return (data ?? []) as unknown as Comment[];
 }
 
-/** Puts each work in the room it hangs in, rooms in order, empty rooms dropped. */
+/** Puts each work in the room it hangs in: rooms in order, works in order, empty rooms dropped. */
 export function groupByRoom(rooms: Room[], artworks: Artwork[]): { room: Room; artworks: Artwork[] }[] {
-  return rooms
-    .map((room) => ({ room, artworks: artworks.filter((a) => a.room_id === room.id) }))
+  const byOrder = <T extends { sort_order: number }>(list: T[]) => [...list].sort((a, b) => a.sort_order - b.sort_order);
+  return byOrder(rooms)
+    .map((room) => ({ room, artworks: byOrder(artworks.filter((a) => a.room_id === room.id)) }))
     .filter((g) => g.artworks.length > 0);
 }
 
 export function average(value: number | string | null): number {
   if (value === null) return 0;
   return typeof value === 'number' ? value : Number(value);
+}
+
+/** Where `id` sits in the gallery's hanging order, and the works on either side. */
+export function neighbors<T extends { id: string }>(list: T[], id: string): { index: number; prev: T | null; next: T | null } {
+  const index = list.findIndex((a) => a.id === id);
+  if (index < 0) return { index, prev: null, next: null };
+  return { index, prev: list[index - 1] ?? null, next: list[index + 1] ?? null };
 }

@@ -68,29 +68,34 @@ class _ReactionsScreenState extends ConsumerState<ReactionsScreen> {
             Card(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  _Stat(label: l10n.visitorsThisWeek, value: summary.value?.viewsThisWeek),
-                  _Stat(label: l10n.likes, value: summary.value?.totalLikes),
-                  _Stat(label: l10n.pendingApproval, value: summary.value?.pendingComments),
-                ]),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _Stat(label: l10n.visitorsThisWeek, value: summary.value?.viewsThisWeek),
+                    _Stat(label: l10n.likes, value: summary.value?.totalLikes),
+                    _Stat(label: l10n.pendingApproval, value: summary.value?.pendingComments),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
             AsyncBody(
               value: comments,
               onRetry: () => ref.invalidate(moderationProvider(gallery.id)),
-              builder: (list) => Column(children: [
-                for (final c in list)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _CommentCard(
-                      comment: c,
-                      onApprove: () => _moderate(gallery, c, CommentStatus.visible),
-                      onHide: () => _moderate(gallery, c, CommentStatus.hidden),
-                      onBlock: () => _block(gallery, c),
+              builder: (list) => Column(
+                children: [
+                  for (final c in list)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _CommentCard(
+                        comment: c,
+                        onApprove: () => _moderate(gallery, c, CommentStatus.visible),
+                        onHide: () => _moderate(gallery, c, CommentStatus.hidden),
+                        onBlock: () => _block(gallery, c),
+                      ),
                     ),
-                  ),
-              ]),
+                ],
+              ),
             ),
             AsyncBody(
               value: notifications,
@@ -102,19 +107,21 @@ class _ReactionsScreenState extends ConsumerState<ReactionsScreen> {
                     child: Text(l10n.noReactions, style: const TextStyle(color: Palette.muted)),
                   );
                 }
-                return Column(children: [
-                  for (final n in ratings)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Card(
-                        child: ListTile(
-                          leading: const Icon(Icons.star_outline, color: Palette.accent),
-                          title: Text(_notificationText(l10n, n)),
-                          subtitle: Text(_ago(context, n.createdAt), style: const TextStyle(color: Palette.muted)),
+                return Column(
+                  children: [
+                    for (final n in ratings)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            leading: const Icon(Icons.star_outline, color: Palette.accent),
+                            title: Text(_notificationText(l10n, n)),
+                            subtitle: Text(_ago(context, n.createdAt), style: const TextStyle(color: Palette.muted)),
+                          ),
                         ),
                       ),
-                    ),
-                ]);
+                  ],
+                );
               },
             ),
           ],
@@ -125,14 +132,13 @@ class _ReactionsScreenState extends ConsumerState<ReactionsScreen> {
 }
 
 String _notificationText(AppLocalizations l10n, AppNotification n) => switch (n.kind) {
-      NotificationKind.rating => l10n.notifRating(n.artworkTitle ?? ''),
-      NotificationKind.comment => l10n.notifComment(n.artworkTitle ?? ''),
-      NotificationKind.guestbook => l10n.notifGuestbook,
-      NotificationKind.commentPending => l10n.notifPending,
-    };
+  NotificationKind.rating => l10n.notifRating(n.artworkTitle ?? ''),
+  NotificationKind.comment => l10n.notifComment(n.artworkTitle ?? ''),
+  NotificationKind.guestbook => l10n.notifGuestbook,
+  NotificationKind.commentPending => l10n.notifPending,
+};
 
-String _ago(BuildContext context, DateTime t) =>
-    MaterialLocalizations.of(context).formatShortDate(t.toLocal());
+String _ago(BuildContext context, DateTime t) => MaterialLocalizations.of(context).formatShortDate(t.toLocal());
 
 class _Stat extends StatelessWidget {
   const _Stat({required this.label, required this.value});
@@ -141,11 +147,14 @@ class _Stat extends StatelessWidget {
   final int? value;
 
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Palette.muted)),
-        const SizedBox(height: 2),
-        Text(value?.toString() ?? '–', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-      ]);
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: const TextStyle(fontSize: 12, color: Palette.muted)),
+      const SizedBox(height: 2),
+      Text(value?.toString() ?? '–', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+    ],
+  );
 }
 
 class _CommentCard extends StatelessWidget {
@@ -168,36 +177,51 @@ class _CommentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: pending ? const Color(0xFFC9D2EE) : Palette.line),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text.rich(
-          TextSpan(children: [
-            if (pending)
-              TextSpan(
-                text: '${l10n.pendingApproval} · ',
-                style: const TextStyle(color: Palette.accent, fontWeight: FontWeight.w500),
-              ),
-            TextSpan(text: where),
-          ]),
-          style: const TextStyle(fontSize: 12, color: Palette.muted),
-        ),
-        const SizedBox(height: 6),
-        Text.rich(TextSpan(children: [
-          TextSpan(text: '${comment.authorName}  ', style: const TextStyle(fontWeight: FontWeight.w500)),
-          TextSpan(text: comment.body),
-        ]), style: const TextStyle(height: 1.6)),
-        const SizedBox(height: 4),
-        Row(children: [
-          if (pending) FilledButton.tonal(onPressed: onApprove, child: Text(l10n.approve)),
-          if (pending) const SizedBox(width: 8),
-          TextButton(onPressed: onHide, child: Text(l10n.hide)),
-          const Spacer(),
-          TextButton(
-            onPressed: onBlock,
-            style: TextButton.styleFrom(foregroundColor: Palette.muted),
-            child: Text(l10n.blockAuthor),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
+              children: [
+                if (pending)
+                  TextSpan(
+                    text: '${l10n.pendingApproval} · ',
+                    style: const TextStyle(color: Palette.accent, fontWeight: FontWeight.w500),
+                  ),
+                TextSpan(text: where),
+              ],
+            ),
+            style: const TextStyle(fontSize: 12, color: Palette.muted),
           ),
-        ]),
-      ]),
+          const SizedBox(height: 6),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '${comment.authorName}  ',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                TextSpan(text: comment.body),
+              ],
+            ),
+            style: const TextStyle(height: 1.6),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              if (pending) FilledButton.tonal(onPressed: onApprove, child: Text(l10n.approve)),
+              if (pending) const SizedBox(width: 8),
+              TextButton(onPressed: onHide, child: Text(l10n.hide)),
+              const Spacer(),
+              TextButton(
+                onPressed: onBlock,
+                style: TextButton.styleFrom(foregroundColor: Palette.muted),
+                child: Text(l10n.blockAuthor),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

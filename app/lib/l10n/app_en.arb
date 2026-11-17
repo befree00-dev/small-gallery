@@ -45,7 +45,13 @@
   "roomTitle": "Room name",
   "roomStatement": "Room statement",
   "artworksCount": "{count, plural, =1{1 work} other{{count} works}}",
-  "@artworksCount": {"placeholders": {"count": {"type": "int"}}},
+  "@artworksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "viewAsVisitor": "View as a visitor",
   "shareGallery": "Copy gallery link",
   "linkCopied": "Link copied",
@@ -87,7 +93,16 @@
   "acceptRatings": "Accept visitor ratings",
   "hangArtwork": "Hang in room",
   "uploading": "Uploading {done} of {total}",
-  "@uploading": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
+  "@uploading": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "uploadDone": "Your work is on the wall",
   "fileTooLarge": "Files over 50 MB can't be uploaded",
   "unsupportedImage": "This image can't be opened",
@@ -104,9 +119,21 @@
   "blockAuthor": "Block author",
   "report": "Report",
   "notifRating": "New rating · {title}",
-  "@notifRating": {"placeholders": {"title": {"type": "String"}}},
+  "@notifRating": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "notifComment": "New comment · {title}",
-  "@notifComment": {"placeholders": {"title": {"type": "String"}}},
+  "@notifComment": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "notifGuestbook": "New guestbook entry",
   "notifPending": "A comment awaits approval",
   "noReactions": "No reactions yet. Try sharing your gallery link.",
@@ -122,9 +149,30 @@
   "language": "Language",
   "signOut": "Sign out",
   "planUsage": "{plan} plan · {count} / {limit} works",
-  "@planUsage": {"placeholders": {"plan": {"type": "String"}, "count": {"type": "int"}, "limit": {"type": "int"}}},
+  "@planUsage": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "galleryStats": "{artworks} works · {rooms} rooms",
-  "@galleryStats": {"placeholders": {"artworks": {"type": "int"}, "rooms": {"type": "int"}}},
+  "@galleryStats": {
+    "placeholders": {
+      "artworks": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
   "guestbook": "Guestbook",
   "writeGuestbook": "Sign the guestbook",
   "galleryNotFound": "Gallery not found",
@@ -140,7 +188,13 @@
   "ratingSent": "Your rating went to the artist",
   "ratingNote": "Averages appear once 5 people have rated. The artist sees yours right away.",
   "ratingAverages": "Average · {count} ratings",
-  "@ratingAverages": {"placeholders": {"count": {"type": "int"}}},
+  "@ratingAverages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "signInToReact": "Sign in to rate and comment",
   "writeComment": "Write a comment",
   "commentPending": "Visible once the artist approves it",
@@ -148,9 +202,45 @@
   "ratingsOff": "The artist isn't taking ratings for this work",
   "ownArtwork": "You can't rate your own work",
   "starLabel": "{criterion}: {n} stars",
-  "@starLabel": {"placeholders": {"criterion": {"type": "String"}, "n": {"type": "int"}}},
+  "@starLabel": {
+    "placeholders": {
+      "criterion": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "send": "Send",
   "loadFailed": "Couldn't load this. Please try again.",
   "retry": "Try again",
-  "somethingWrong": "Something went wrong. Please try again shortly."
+  "somethingWrong": "Something went wrong. Please try again shortly.",
+  "prevWork": "Previous work: {title}",
+  "@prevWork": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "nextWork": "Next work: {title}",
+  "@nextWork": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "workPosition": "{index} of {total}",
+  "@workPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

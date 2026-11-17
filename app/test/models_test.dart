@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:small_gallery/data/models.dart';
 import 'package:small_gallery/data/supabase_repository.dart';
+
 import 'dart:typed_data';
 
 void main() {
@@ -43,7 +44,7 @@ void main() {
       'gallery_id': 'g1',
       'title': '봄',
       'artworks': [
-        {'count': 8}
+        {'count': 8},
       ],
     });
     expect(r.artworkCount, 8);

@@ -69,11 +69,11 @@ class Profile {
   int get artworkLimit => plan == 'plus' ? 2000 : 100;
 
   factory Profile.fromJson(Map<String, dynamic> j) => Profile(
-        id: j['id'] as String,
-        displayName: (j['display_name'] as String?) ?? '',
-        locale: (j['locale'] as String?) ?? 'ko',
-        plan: (j['plan'] as String?) ?? 'free',
-      );
+    id: j['id'] as String,
+    displayName: (j['display_name'] as String?) ?? '',
+    locale: (j['locale'] as String?) ?? 'ko',
+    plan: (j['plan'] as String?) ?? 'free',
+  );
 }
 
 class Gallery {
@@ -108,33 +108,33 @@ class Gallery {
   final String ownerName;
 
   factory Gallery.fromJson(Map<String, dynamic> j) => Gallery(
-        id: j['id'] as String,
-        ownerId: j['owner_id'] as String,
-        handle: j['handle'] as String,
-        title: j['title'] as String,
-        titleEn: j['title_en'] as String?,
-        bio: (j['bio'] as String?) ?? '',
-        bioEn: j['bio_en'] as String?,
-        field: ArtField.parse(j['field'] as String?),
-        theme: GalleryTheme.parse(j['theme'] as String?),
-        visibility: Audience.parse(j['visibility'] as String?),
-        ratingEnabled: (j['rating_enabled'] as bool?) ?? true,
-        commentPolicy: CommentPolicy.parse(j['comment_policy'] as String?),
-        ownerName: ((j['profiles'] as Map<String, dynamic>?)?['display_name'] as String?) ?? '',
-      );
+    id: j['id'] as String,
+    ownerId: j['owner_id'] as String,
+    handle: j['handle'] as String,
+    title: j['title'] as String,
+    titleEn: j['title_en'] as String?,
+    bio: (j['bio'] as String?) ?? '',
+    bioEn: j['bio_en'] as String?,
+    field: ArtField.parse(j['field'] as String?),
+    theme: GalleryTheme.parse(j['theme'] as String?),
+    visibility: Audience.parse(j['visibility'] as String?),
+    ratingEnabled: (j['rating_enabled'] as bool?) ?? true,
+    commentPolicy: CommentPolicy.parse(j['comment_policy'] as String?),
+    ownerName: ((j['profiles'] as Map<String, dynamic>?)?['display_name'] as String?) ?? '',
+  );
 
   /// Columns an artist may edit.
   Map<String, dynamic> toUpdateJson() => {
-        'title': title,
-        'title_en': _nullIfBlank(titleEn),
-        'bio': bio,
-        'bio_en': _nullIfBlank(bioEn),
-        'field': field.name,
-        'theme': theme.name,
-        'visibility': visibility.name,
-        'rating_enabled': ratingEnabled,
-        'comment_policy': commentPolicy.name,
-      };
+    'title': title,
+    'title_en': _nullIfBlank(titleEn),
+    'bio': bio,
+    'bio_en': _nullIfBlank(bioEn),
+    'field': field.name,
+    'theme': theme.name,
+    'visibility': visibility.name,
+    'rating_enabled': ratingEnabled,
+    'comment_policy': commentPolicy.name,
+  };
 
   Gallery copyWith({
     String? title,
@@ -145,22 +145,21 @@ class Gallery {
     Audience? visibility,
     bool? ratingEnabled,
     CommentPolicy? commentPolicy,
-  }) =>
-      Gallery(
-        id: id,
-        ownerId: ownerId,
-        handle: handle,
-        title: title ?? this.title,
-        titleEn: titleEn ?? this.titleEn,
-        bio: bio ?? this.bio,
-        bioEn: bioEn ?? this.bioEn,
-        field: field,
-        theme: theme ?? this.theme,
-        visibility: visibility ?? this.visibility,
-        ratingEnabled: ratingEnabled ?? this.ratingEnabled,
-        commentPolicy: commentPolicy ?? this.commentPolicy,
-        ownerName: ownerName,
-      );
+  }) => Gallery(
+    id: id,
+    ownerId: ownerId,
+    handle: handle,
+    title: title ?? this.title,
+    titleEn: titleEn ?? this.titleEn,
+    bio: bio ?? this.bio,
+    bioEn: bioEn ?? this.bioEn,
+    field: field,
+    theme: theme ?? this.theme,
+    visibility: visibility ?? this.visibility,
+    ratingEnabled: ratingEnabled ?? this.ratingEnabled,
+    commentPolicy: commentPolicy ?? this.commentPolicy,
+    ownerName: ownerName,
+  );
 }
 
 class Room {
@@ -206,25 +205,25 @@ class Room {
   }
 
   Map<String, dynamic> toUpdateJson() => {
-        'title': title,
-        'title_en': _nullIfBlank(titleEn),
-        'statement': statement,
-        'statement_en': _nullIfBlank(statementEn),
-        'visibility': visibility.name,
-        'sort_order': sortOrder,
-      };
+    'title': title,
+    'title_en': _nullIfBlank(titleEn),
+    'statement': statement,
+    'statement_en': _nullIfBlank(statementEn),
+    'visibility': visibility.name,
+    'sort_order': sortOrder,
+  };
 
   Room copyWith({String? title, String? statement, Audience? visibility}) => Room(
-        id: id,
-        galleryId: galleryId,
-        title: title ?? this.title,
-        titleEn: titleEn,
-        statement: statement ?? this.statement,
-        statementEn: statementEn,
-        sortOrder: sortOrder,
-        visibility: visibility ?? this.visibility,
-        artworkCount: artworkCount,
-      );
+    id: id,
+    galleryId: galleryId,
+    title: title ?? this.title,
+    titleEn: titleEn,
+    statement: statement ?? this.statement,
+    statementEn: statementEn,
+    sortOrder: sortOrder,
+    visibility: visibility ?? this.visibility,
+    artworkCount: artworkCount,
+  );
 }
 
 class Artwork {
@@ -279,44 +278,44 @@ class Artwork {
   double get aspectRatio => width / height;
 
   factory Artwork.fromJson(Map<String, dynamic> j) => Artwork(
-        id: j['id'] as String,
-        galleryId: j['gallery_id'] as String,
-        roomId: j['room_id'] as String,
-        title: j['title'] as String,
-        titleEn: j['title_en'] as String?,
-        year: j['year'] as int?,
-        medium: (j['medium'] as String?) ?? '',
-        sizeText: (j['size_text'] as String?) ?? '',
-        note: (j['note'] as String?) ?? '',
-        noteEn: j['note_en'] as String?,
-        sortOrder: (j['sort_order'] as int?) ?? 0,
-        visibility: Audience.parse(j['visibility'] as String?),
-        isFeatured: (j['is_featured'] as bool?) ?? false,
-        ratingEnabled: (j['rating_enabled'] as bool?) ?? true,
-        watermark: (j['watermark'] as bool?) ?? false,
-        imagePath: j['image_path'] as String,
-        thumbPath: j['thumb_path'] as String,
-        width: j['width'] as int,
-        height: j['height'] as int,
-        exif: (j['exif'] as Map<String, dynamic>?) ?? const {},
-        likeCount: (j['like_count'] as int?) ?? 0,
-        commentCount: (j['comment_count'] as int?) ?? 0,
-      );
+    id: j['id'] as String,
+    galleryId: j['gallery_id'] as String,
+    roomId: j['room_id'] as String,
+    title: j['title'] as String,
+    titleEn: j['title_en'] as String?,
+    year: j['year'] as int?,
+    medium: (j['medium'] as String?) ?? '',
+    sizeText: (j['size_text'] as String?) ?? '',
+    note: (j['note'] as String?) ?? '',
+    noteEn: j['note_en'] as String?,
+    sortOrder: (j['sort_order'] as int?) ?? 0,
+    visibility: Audience.parse(j['visibility'] as String?),
+    isFeatured: (j['is_featured'] as bool?) ?? false,
+    ratingEnabled: (j['rating_enabled'] as bool?) ?? true,
+    watermark: (j['watermark'] as bool?) ?? false,
+    imagePath: j['image_path'] as String,
+    thumbPath: j['thumb_path'] as String,
+    width: j['width'] as int,
+    height: j['height'] as int,
+    exif: (j['exif'] as Map<String, dynamic>?) ?? const {},
+    likeCount: (j['like_count'] as int?) ?? 0,
+    commentCount: (j['comment_count'] as int?) ?? 0,
+  );
 
   Map<String, dynamic> toUpdateJson() => {
-        'room_id': roomId,
-        'title': title,
-        'title_en': _nullIfBlank(titleEn),
-        'year': year,
-        'medium': medium,
-        'size_text': sizeText,
-        'note': note,
-        'note_en': _nullIfBlank(noteEn),
-        'visibility': visibility.name,
-        'is_featured': isFeatured,
-        'rating_enabled': ratingEnabled,
-        'sort_order': sortOrder,
-      };
+    'room_id': roomId,
+    'title': title,
+    'title_en': _nullIfBlank(titleEn),
+    'year': year,
+    'medium': medium,
+    'size_text': sizeText,
+    'note': note,
+    'note_en': _nullIfBlank(noteEn),
+    'visibility': visibility.name,
+    'is_featured': isFeatured,
+    'rating_enabled': ratingEnabled,
+    'sort_order': sortOrder,
+  };
 
   Artwork copyWith({
     String? title,
@@ -331,31 +330,30 @@ class Artwork {
     bool? isFeatured,
     bool? ratingEnabled,
     int? likeCount,
-  }) =>
-      Artwork(
-        id: id,
-        galleryId: galleryId,
-        roomId: roomId,
-        title: title ?? this.title,
-        titleEn: titleEn ?? this.titleEn,
-        year: year ?? this.year,
-        medium: medium ?? this.medium,
-        sizeText: sizeText ?? this.sizeText,
-        note: note ?? this.note,
-        noteEn: noteEn ?? this.noteEn,
-        sortOrder: sortOrder ?? this.sortOrder,
-        visibility: visibility ?? this.visibility,
-        isFeatured: isFeatured ?? this.isFeatured,
-        ratingEnabled: ratingEnabled ?? this.ratingEnabled,
-        watermark: watermark,
-        imagePath: imagePath,
-        thumbPath: thumbPath,
-        width: width,
-        height: height,
-        exif: exif,
-        likeCount: likeCount ?? this.likeCount,
-        commentCount: commentCount,
-      );
+  }) => Artwork(
+    id: id,
+    galleryId: galleryId,
+    roomId: roomId,
+    title: title ?? this.title,
+    titleEn: titleEn ?? this.titleEn,
+    year: year ?? this.year,
+    medium: medium ?? this.medium,
+    sizeText: sizeText ?? this.sizeText,
+    note: note ?? this.note,
+    noteEn: noteEn ?? this.noteEn,
+    sortOrder: sortOrder ?? this.sortOrder,
+    visibility: visibility ?? this.visibility,
+    isFeatured: isFeatured ?? this.isFeatured,
+    ratingEnabled: ratingEnabled ?? this.ratingEnabled,
+    watermark: watermark,
+    imagePath: imagePath,
+    thumbPath: thumbPath,
+    width: width,
+    height: height,
+    exif: exif,
+    likeCount: likeCount ?? this.likeCount,
+    commentCount: commentCount,
+  );
 }
 
 /// One visitor's scores, 1–5 each.
@@ -368,14 +366,18 @@ class Rating {
   final int emotion;
 
   factory Rating.fromJson(Map<String, dynamic> j) => Rating(
-        composition: j['composition'] as int,
-        color: j['color'] as int,
-        technique: j['technique'] as int,
-        emotion: j['emotion'] as int,
-      );
+    composition: j['composition'] as int,
+    color: j['color'] as int,
+    technique: j['technique'] as int,
+    emotion: j['emotion'] as int,
+  );
 
-  Map<String, dynamic> toJson() =>
-      {'composition': composition, 'color': color, 'technique': technique, 'emotion': emotion};
+  Map<String, dynamic> toJson() => {
+    'composition': composition,
+    'color': color,
+    'technique': technique,
+    'emotion': emotion,
+  };
 }
 
 /// Averages. Visitors only receive these once 5 or more ratings exist.
@@ -443,16 +445,16 @@ class Comment {
   bool get isGuestbook => artworkId == null;
 
   factory Comment.fromJson(Map<String, dynamic> j) => Comment(
-        id: j['id'] as String,
-        galleryId: j['gallery_id'] as String,
-        artworkId: j['artwork_id'] as String?,
-        artworkTitle: (j['artworks'] as Map<String, dynamic>?)?['title'] as String?,
-        authorId: j['author_id'] as String,
-        authorName: ((j['profiles'] as Map<String, dynamic>?)?['display_name'] as String?) ?? '',
-        body: j['body'] as String,
-        status: CommentStatus.parse(j['status'] as String?),
-        createdAt: DateTime.parse(j['created_at'] as String),
-      );
+    id: j['id'] as String,
+    galleryId: j['gallery_id'] as String,
+    artworkId: j['artwork_id'] as String?,
+    artworkTitle: (j['artworks'] as Map<String, dynamic>?)?['title'] as String?,
+    authorId: j['author_id'] as String,
+    authorName: ((j['profiles'] as Map<String, dynamic>?)?['display_name'] as String?) ?? '',
+    body: j['body'] as String,
+    status: CommentStatus.parse(j['status'] as String?),
+    createdAt: DateTime.parse(j['created_at'] as String),
+  );
 }
 
 enum NotificationKind {
@@ -462,11 +464,11 @@ enum NotificationKind {
   guestbook;
 
   static NotificationKind parse(String value) => switch (value) {
-        'comment_pending' => NotificationKind.commentPending,
-        'rating' => NotificationKind.rating,
-        'guestbook' => NotificationKind.guestbook,
-        _ => NotificationKind.comment,
-      };
+    'comment_pending' => NotificationKind.commentPending,
+    'rating' => NotificationKind.rating,
+    'guestbook' => NotificationKind.guestbook,
+    _ => NotificationKind.comment,
+  };
 }
 
 class AppNotification {
@@ -491,14 +493,14 @@ class AppNotification {
   bool get isUnread => readAt == null;
 
   factory AppNotification.fromJson(Map<String, dynamic> j) => AppNotification(
-        id: j['id'] as String,
-        kind: NotificationKind.parse(j['kind'] as String),
-        artworkId: j['artwork_id'] as String?,
-        artworkTitle: (j['artworks'] as Map<String, dynamic>?)?['title'] as String?,
-        commentId: j['comment_id'] as String?,
-        createdAt: DateTime.parse(j['created_at'] as String),
-        readAt: j['read_at'] == null ? null : DateTime.parse(j['read_at'] as String),
-      );
+    id: j['id'] as String,
+    kind: NotificationKind.parse(j['kind'] as String),
+    artworkId: j['artwork_id'] as String?,
+    artworkTitle: (j['artworks'] as Map<String, dynamic>?)?['title'] as String?,
+    commentId: j['comment_id'] as String?,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    readAt: j['read_at'] == null ? null : DateTime.parse(j['read_at'] as String),
+  );
 }
 
 class StudioSummary {

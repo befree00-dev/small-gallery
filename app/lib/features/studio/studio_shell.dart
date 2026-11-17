@@ -30,16 +30,23 @@ class StudioShell extends ConsumerWidget {
       // A saved session can outlive the account or hit a server problem;
       // always leave a way out besides retrying.
       error: (e, _) => Scaffold(
-        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          AsyncBody(value: gallery, builder: (_) => const SizedBox(), onRetry: () => ref.invalidate(myGalleryProvider)),
-          TextButton(
-            onPressed: () async {
-              await ref.read(repositoryProvider).signOut();
-              ref.invalidate(myGalleryProvider);
-            },
-            child: Text(context.l10n.signOut),
-          ),
-        ]),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AsyncBody(
+              value: gallery,
+              builder: (_) => const SizedBox(),
+              onRetry: () => ref.invalidate(myGalleryProvider),
+            ),
+            TextButton(
+              onPressed: () async {
+                await ref.read(repositoryProvider).signOut();
+                ref.invalidate(myGalleryProvider);
+              },
+              child: Text(context.l10n.signOut),
+            ),
+          ],
+        ),
       ),
       data: (g) => g == null ? const OnboardingScreen() : _scaffold(context, ref),
     );
@@ -63,19 +70,25 @@ class StudioShell extends ConsumerWidget {
 
     if (isWide(context)) {
       return Scaffold(
-        body: Row(children: [
-          NavigationRail(
-            selectedIndex: _index,
-            onDestinationSelected: go,
-            labelType: NavigationRailLabelType.all,
-            destinations: [
-              for (var i = 0; i < items.length; i++)
-                NavigationRailDestination(icon: icon(i, false), selectedIcon: icon(i, true), label: Text(items[i].$3)),
-            ],
-          ),
-          const VerticalDivider(width: 1),
-          Expanded(child: child),
-        ]),
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: _index,
+              onDestinationSelected: go,
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                for (var i = 0; i < items.length; i++)
+                  NavigationRailDestination(
+                    icon: icon(i, false),
+                    selectedIcon: icon(i, true),
+                    label: Text(items[i].$3),
+                  ),
+              ],
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(child: child),
+          ],
+        ),
       );
     }
     return Scaffold(

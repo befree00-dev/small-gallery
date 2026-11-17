@@ -130,7 +130,24 @@ button, input, textarea { font: inherit; color: inherit; }
 .notice { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
 
 /* Artwork viewer: always the dark room. */
-.viewer .stage { display: flex; justify-content: center; padding: 16px 0 24px; }
+.viewer .stage { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 24px 0 22px; }
+.viewer .stage img { min-width: 0; }
+.nav-arrow {
+  flex-shrink: 0; width: 48px; height: 48px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+}
+.nav-arrow:hover { text-decoration: none; border-color: var(--muted); }
+.nav-arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav-arrow[data-disabled='true'] { opacity: 0.25; }
+.viewer .position { text-align: center; margin: 0 0 16px; }
+@media (max-width: 600px) {
+  /* Phones: arrows sit over the image edges so the work keeps its width. */
+  .viewer .stage { position: relative; gap: 0; }
+  .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; background: rgba(31, 30, 28, 0.72); border-color: transparent; color: #f2f1ed; z-index: 1; }
+  .nav-arrow:first-child { left: 4px; }
+  .nav-arrow:last-child { right: 4px; }
+}
 .viewer .stage img {
   max-height: 72vh; width: auto; height: auto; max-width: 100%;
   box-shadow: 0 0 0 10px #f4f1ea; user-select: none; -webkit-user-drag: none;

@@ -13,12 +13,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Small Gallery';
 
   @override
-  String get welcomeHeadline =>
-      'Where anyone can have a small gallery of their own';
+  String get welcomeHeadline => 'Where anyone can have a small gallery of their own';
 
   @override
-  String get welcomeBody =>
-      'Upload your work and your own small gallery opens right away.';
+  String get welcomeBody => 'Upload your work and your own small gallery opens right away.';
 
   @override
   String get signIn => 'Sign in';
@@ -60,8 +58,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authFailed => 'Couldn\'t sign in. Check your email and password.';
 
   @override
-  String get checkEmail =>
-      'We sent you a confirmation email. Open its link, then sign in.';
+  String get checkEmail => 'We sent you a confirmation email. Open its link, then sign in.';
 
   @override
   String get passwordRule => 'At least 8 characters';
@@ -146,12 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String artworksCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count works',
-      one: '1 work',
-    );
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count works', one: '1 work');
     return '$_temp0';
   }
 
@@ -195,12 +187,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saved => 'Saved';
 
   @override
-  String get deleteRoomConfirm =>
-      'This deletes the room and every work in it. Continue?';
+  String get deleteRoomConfirm => 'This deletes the room and every work in it. Continue?';
 
   @override
-  String get deleteArtworkConfirm =>
-      'Delete this work? Its ratings and comments are deleted too.';
+  String get deleteArtworkConfirm => 'Delete this work? Its ratings and comments are deleted too.';
 
   @override
   String get dragToReorder => 'Drag to reorder. Visitors see the same order.';
@@ -429,8 +419,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ratingSent => 'Your rating went to the artist';
 
   @override
-  String get ratingNote =>
-      'Averages appear once 5 people have rated. The artist sees yours right away.';
+  String get ratingNote => 'Averages appear once 5 people have rated. The artist sees yours right away.';
 
   @override
   String ratingAverages(int count) {
@@ -470,6 +459,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Try again';
 
   @override
-  String get somethingWrong =>
-      'Something went wrong. Please try again shortly.';
+  String get somethingWrong => 'Something went wrong. Please try again shortly.';
+
+  @override
+  String prevWork(String title) {
+    return 'Previous work: $title';
+  }
+
+  @override
+  String nextWork(String title) {
+    return 'Next work: $title';
+  }
+
+  @override
+  String workPosition(int index, int total) {
+    return '$index of $total';
+  }
 }

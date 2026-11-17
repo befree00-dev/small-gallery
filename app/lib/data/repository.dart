@@ -11,7 +11,12 @@ abstract interface class GalleryRepository {
   Future<void> signIn({required String email, required String password});
 
   /// Returns true when the account is ready, false when email confirmation is pending.
-  Future<bool> signUp({required String email, required String password, required String displayName, required String locale});
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String displayName,
+    required String locale,
+  });
   Future<void> signInWithProvider(String provider);
   Future<void> signOut();
   Future<Profile?> myProfile();
@@ -35,11 +40,7 @@ abstract interface class GalleryRepository {
 
   Future<List<Artwork>> artworks(String roomId);
   Future<int> artworkCount(String galleryId);
-  Future<Artwork> uploadArtwork({
-    required Gallery gallery,
-    required ArtworkDraft draft,
-    required Uint8List imageBytes,
-  });
+  Future<Artwork> uploadArtwork({required Gallery gallery, required ArtworkDraft draft, required Uint8List imageBytes});
   Future<void> updateArtwork(Artwork artwork);
   Future<void> reorderArtworks(List<Artwork> inOrder);
   Future<void> deleteArtwork(Artwork artwork);

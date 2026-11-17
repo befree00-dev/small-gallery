@@ -5,7 +5,11 @@ import 'package:small_gallery/features/visitor/rating_panel.dart';
 
 import 'fakes.dart';
 
-Widget panel() => const Scaffold(body: SingleChildScrollView(child: RatingPanel(gallery: testGallery, artwork: testArtwork)));
+Widget panel() => const Scaffold(
+  body: SingleChildScrollView(
+    child: RatingPanel(gallery: testGallery, artwork: testArtwork),
+  ),
+);
 
 FilledButton sendButton(WidgetTester tester) =>
     tester.widget<FilledButton>(find.widgetWithText(FilledButton, '평가 남기기'));
@@ -55,25 +59,42 @@ void main() {
   });
 
   testWidgets('averages stay hidden from visitors until 5 people have rated', (tester) async {
-    await pumpWithApp(tester, panel(), repo: FakeRepository(userId: visitorId, stats: threeRatings));
+    await pumpWithApp(
+      tester,
+      panel(),
+      repo: FakeRepository(userId: visitorId, stats: threeRatings),
+    );
     expect(find.textContaining('평균 평점'), findsNothing);
   });
 
   testWidgets('averages show once 5 people have rated', (tester) async {
-    await pumpWithApp(tester, panel(), repo: FakeRepository(userId: visitorId, stats: fiveRatings));
+    await pumpWithApp(
+      tester,
+      panel(),
+      repo: FakeRepository(userId: visitorId, stats: fiveRatings),
+    );
     expect(find.text('평균 평점 · 5명 참여'), findsOneWidget);
     expect(find.text('4.5'), findsOneWidget);
   });
 
   testWidgets('the artist sees averages from the first rating but cannot rate', (tester) async {
-    await pumpWithApp(tester, panel(), repo: FakeRepository(userId: artistId, stats: threeRatings));
+    await pumpWithApp(
+      tester,
+      panel(),
+      repo: FakeRepository(userId: artistId, stats: threeRatings),
+    );
     expect(find.text('평균 평점 · 3명 참여'), findsOneWidget);
     expect(find.text('내 작품은 평가할 수 없어요'), findsOneWidget);
     expect(find.text('평가 남기기'), findsNothing);
   });
 
   testWidgets('works in English', (tester) async {
-    await pumpWithApp(tester, panel(), repo: FakeRepository(userId: visitorId), locale: const Locale('en'));
+    await pumpWithApp(
+      tester,
+      panel(),
+      repo: FakeRepository(userId: visitorId),
+      locale: const Locale('en'),
+    );
     expect(find.text('Rate this work'), findsOneWidget);
     expect(find.byTooltip('Composition: 5 stars'), findsOneWidget);
   });

@@ -8,8 +8,12 @@ import 'package:small_gallery/state/providers.dart';
 
 import 'fakes.dart';
 
-XFile photo(String name) =>
-    XFile.fromData(img.encodePng(img.Image(width: 8, height: 8)), name: name, path: '/picked/$name', mimeType: 'image/png');
+XFile photo(String name) => XFile.fromData(
+  img.encodePng(img.Image(width: 8, height: 8)),
+  name: name,
+  path: '/picked/$name',
+  mimeType: 'image/png',
+);
 
 Future<void> pumpUpload(WidgetTester tester, FakeRepository repo, List<XFile> picked) async {
   // Tall enough that the whole form is built (ListView builds lazily).

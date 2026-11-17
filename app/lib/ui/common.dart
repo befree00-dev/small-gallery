@@ -10,8 +10,9 @@ extension L10nX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
   String get lang => Localizations.localeOf(this).languageCode;
 
-  void toast(String message) =>
-      ScaffoldMessenger.of(this)..hideCurrentSnackBar()..showSnackBar(SnackBar(content: Text(message)));
+  void toast(String message) => ScaffoldMessenger.of(this)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
 }
 
 /// A user-facing sentence for an error thrown by the repository.
@@ -43,18 +44,26 @@ class AsyncBody<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value.when(
       data: builder,
-      loading: () => const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())),
+      loading: () => const Center(
+        child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()),
+      ),
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(errorText(context.l10n, e),
-                textAlign: TextAlign.center, style: TextStyle(color: dark ? Palette.darkInk : Palette.ink)),
-            if (onRetry != null) ...[
-              const SizedBox(height: 12),
-              OutlinedButton(onPressed: onRetry, child: Text(context.l10n.retry)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                errorText(context.l10n, e),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: dark ? Palette.darkInk : Palette.ink),
+              ),
+              if (onRetry != null) ...[
+                const SizedBox(height: 12),
+                OutlinedButton(onPressed: onRetry, child: Text(context.l10n.retry)),
+              ],
             ],
-          ]),
+          ),
         ),
       ),
     );
@@ -76,9 +85,8 @@ class ArtworkImage extends ConsumerWidget {
       url,
       fit: fit,
       semanticLabel: semanticLabel,
-      frameBuilder: (context, child, frame, sync) => sync || frame != null
-          ? child
-          : const ColoredBox(color: Color(0xFFE8E5DD), child: SizedBox.expand()),
+      frameBuilder: (context, child, frame, sync) =>
+          sync || frame != null ? child : const ColoredBox(color: Color(0xFFE8E5DD), child: SizedBox.expand()),
       errorBuilder: (context, _, _) => const ColoredBox(
         color: Color(0xFFE8E5DD),
         child: Center(child: Icon(Icons.image_not_supported_outlined, color: Palette.muted)),
@@ -88,10 +96,10 @@ class ArtworkImage extends ConsumerWidget {
 }
 
 String visibilityLabel(AppLocalizations l10n, Audience v) => switch (v) {
-      Audience.public => l10n.visibilityPublic,
-      Audience.unlisted => l10n.visibilityUnlisted,
-      Audience.private => l10n.visibilityPrivate,
-    };
+  Audience.public => l10n.visibilityPublic,
+  Audience.unlisted => l10n.visibilityUnlisted,
+  Audience.private => l10n.visibilityPrivate,
+};
 
 /// Where the web gallery is deployed. Set at build time:
 ///   --dart-define=SITE_URL=https://your-site.vercel.app

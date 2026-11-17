@@ -55,9 +55,28 @@ final galleryByHandleProvider = FutureProvider.family<Gallery?, String>(
   (ref, handle) => ref.watch(repositoryProvider).galleryByHandle(handle),
 );
 
-final artworkProvider = FutureProvider.family<Artwork?, String>(
-  (ref, id) => ref.watch(repositoryProvider).artwork(id),
-);
+final artworkProvider = FutureProvider.family<Artwork?, String>((ref, id) => ref.watch(repositoryProvider).artwork(id));
+
+/// Every work a visitor can see, in hanging order (rooms in order, works in
+/// order within each room), with each work's room, for previous/next.
+final gallerySequenceProvider = FutureProvider.family<({List<Artwork> works, Map<String, Room> roomOf}), String>((
+  ref,
+  galleryId,
+) async {
+  final repo = ref.watch(repositoryProvider);
+  final rooms = [...await repo.rooms(galleryId)]..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+  final perRoom = await Future.wait(rooms.map((r) => repo.artworks(r.id)));
+  final works = <Artwork>[];
+  final roomOf = <String, Room>{};
+  for (var i = 0; i < rooms.length; i++) {
+    final inRoom = [...perRoom[i]]..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    for (final w in inRoom) {
+      works.add(w);
+      roomOf[w.id] = rooms[i];
+    }
+  }
+  return (works: works, roomOf: roomOf);
+});
 
 final ratingStatsProvider = FutureProvider.family<RatingStats?, String>(
   (ref, artworkId) => ref.watch(repositoryProvider).ratingStats(artworkId),

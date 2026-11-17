@@ -70,67 +70,87 @@ class _CommentsSectionState extends ConsumerState<CommentsSection> {
     final comments = ref.watch(commentsProvider(_key));
     final closed = widget.gallery.commentPolicy == CommentPolicy.off;
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(
-        widget.artworkId == null ? l10n.guestbook : l10n.comments,
-        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: widget.ink),
-      ),
-      const SizedBox(height: 10),
-      if (closed)
-        Text(l10n.commentsClosed, style: TextStyle(color: widget.muted, fontSize: 13))
-      else if (uid == null)
-        Row(children: [
-          Expanded(child: Text(l10n.signInToReact, style: TextStyle(color: widget.muted, fontSize: 13))),
-          TextButton(onPressed: () => context.push('/welcome'), child: Text(l10n.signIn)),
-        ])
-      else
-        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Expanded(
-            child: TextField(
-              controller: _body,
-              minLines: 1,
-              maxLines: 4,
-              maxLength: 1000,
-              decoration: InputDecoration(
-                hintText: widget.artworkId == null ? l10n.writeGuestbook : l10n.writeComment,
-                counterText: '',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          widget.artworkId == null ? l10n.guestbook : l10n.comments,
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: widget.ink),
+        ),
+        const SizedBox(height: 10),
+        if (closed)
+          Text(l10n.commentsClosed, style: TextStyle(color: widget.muted, fontSize: 13))
+        else if (uid == null)
+          Row(
+            children: [
+              Expanded(
+                child: Text(l10n.signInToReact, style: TextStyle(color: widget.muted, fontSize: 13)),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(onPressed: _busy ? null : _send, child: Text(l10n.send)),
-        ]),
-      const SizedBox(height: 12),
-      comments.when(
-        loading: () => const SizedBox(height: 40),
-        error: (e, _) => Text(l10n.loadFailed, style: TextStyle(color: widget.muted)),
-        data: (list) => Column(children: [
-          for (final c in list)
-            Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.fromLTRB(14, 12, 4, 8),
-              decoration: BoxDecoration(color: widget.card, borderRadius: BorderRadius.circular(10)),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(
-                      c.status == CommentStatus.pending ? '${c.authorName} · ${l10n.commentPending}' : c.authorName,
-                      style: TextStyle(fontSize: 12, color: widget.muted, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(c.body, style: TextStyle(color: widget.ink, height: 1.6)),
-                  ]),
-                ),
-                if (uid != null && uid != c.authorId)
-                  IconButton(
-                    tooltip: l10n.report,
-                    icon: Icon(Icons.flag_outlined, size: 18, color: widget.muted),
-                    onPressed: () => _report(c),
+              TextButton(onPressed: () => context.push('/welcome'), child: Text(l10n.signIn)),
+            ],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _body,
+                  minLines: 1,
+                  maxLines: 4,
+                  maxLength: 1000,
+                  decoration: InputDecoration(
+                    hintText: widget.artworkId == null ? l10n.writeGuestbook : l10n.writeComment,
+                    counterText: '',
                   ),
-              ]),
-            ),
-        ]),
-      ),
-    ]);
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(onPressed: _busy ? null : _send, child: Text(l10n.send)),
+            ],
+          ),
+        const SizedBox(height: 12),
+        comments.when(
+          loading: () => const SizedBox(height: 40),
+          error: (e, _) => Text(l10n.loadFailed, style: TextStyle(color: widget.muted)),
+          data: (list) => Column(
+            children: [
+              for (final c in list)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.fromLTRB(14, 12, 4, 8),
+                  decoration: BoxDecoration(color: widget.card, borderRadius: BorderRadius.circular(10)),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              c.status == CommentStatus.pending
+                                  ? '${c.authorName} · ${l10n.commentPending}'
+                                  : c.authorName,
+                              style: TextStyle(fontSize: 12, color: widget.muted, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(c.body, style: TextStyle(color: widget.ink, height: 1.6)),
+                          ],
+                        ),
+                      ),
+                      if (uid != null && uid != c.authorId)
+                        IconButton(
+                          tooltip: l10n.report,
+                          icon: Icon(Icons.flag_outlined, size: 18, color: widget.muted),
+                          onPressed: () => _report(c),
+                        ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

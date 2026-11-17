@@ -53,17 +53,21 @@ class _ArtworkEditSheetState extends ConsumerState<_ArtworkEditSheet> {
     }
     setState(() => _busy = true);
     try {
-      await ref.read(repositoryProvider).updateArtwork(widget.artwork.copyWith(
-            title: _title.text.trim(),
-            titleEn: _titleEn.text.trim(),
-            year: int.tryParse(_year.text.trim()),
-            sizeText: _size.text.trim(),
-            note: _note.text.trim(),
-            noteEn: _noteEn.text.trim(),
-            visibility: _visibility,
-            isFeatured: _featured,
-            ratingEnabled: _ratings,
-          ));
+      await ref
+          .read(repositoryProvider)
+          .updateArtwork(
+            widget.artwork.copyWith(
+              title: _title.text.trim(),
+              titleEn: _titleEn.text.trim(),
+              year: int.tryParse(_year.text.trim()),
+              sizeText: _size.text.trim(),
+              note: _note.text.trim(),
+              noteEn: _noteEn.text.trim(),
+              visibility: _visibility,
+              isFeatured: _featured,
+              ratingEnabled: _ratings,
+            ),
+          );
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
@@ -97,52 +101,84 @@ class _ArtworkEditSheetState extends ConsumerState<_ArtworkEditSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text(l10n.editArtwork, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 16),
-          TextField(controller: _title, maxLength: 80, decoration: InputDecoration(labelText: l10n.title)),
-          TextField(controller: _titleEn, maxLength: 80, decoration: InputDecoration(labelText: l10n.titleEn)),
-          Row(children: [
-            Expanded(
-              child: TextField(
-                controller: _year,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: l10n.year),
-              ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.editArtwork, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _title,
+              maxLength: 80,
+              decoration: InputDecoration(labelText: l10n.title),
             ),
-            const SizedBox(width: 12),
-            Expanded(child: TextField(controller: _size, decoration: InputDecoration(labelText: l10n.size))),
-          ]),
-          const SizedBox(height: 12),
-          TextField(controller: _note, minLines: 2, maxLines: 5, decoration: InputDecoration(labelText: l10n.artistNote)),
-          const SizedBox(height: 12),
-          TextField(controller: _noteEn, minLines: 1, maxLines: 4, decoration: InputDecoration(labelText: l10n.artistNoteEn)),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<Audience>(
-            initialValue: _visibility,
-            decoration: InputDecoration(labelText: l10n.visibility),
-            items: [for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v)))],
-            onChanged: (v) => setState(() => _visibility = v!),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.featured),
-            value: _featured,
-            onChanged: (v) => setState(() => _featured = v),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.acceptRatings),
-            value: _ratings,
-            onChanged: (v) => setState(() => _ratings = v),
-          ),
-          const SizedBox(height: 12),
-          Row(children: [
-            TextButton(onPressed: _busy ? null : _delete, child: Text(l10n.delete)),
-            const Spacer(),
-            FilledButton(onPressed: _busy ? null : _save, child: Text(l10n.save)),
-          ]),
-        ]),
+            TextField(
+              controller: _titleEn,
+              maxLength: 80,
+              decoration: InputDecoration(labelText: l10n.titleEn),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _year,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: l10n.year),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _size,
+                    decoration: InputDecoration(labelText: l10n.size),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _note,
+              minLines: 2,
+              maxLines: 5,
+              decoration: InputDecoration(labelText: l10n.artistNote),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _noteEn,
+              minLines: 1,
+              maxLines: 4,
+              decoration: InputDecoration(labelText: l10n.artistNoteEn),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<Audience>(
+              initialValue: _visibility,
+              decoration: InputDecoration(labelText: l10n.visibility),
+              items: [
+                for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v))),
+              ],
+              onChanged: (v) => setState(() => _visibility = v!),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.featured),
+              value: _featured,
+              onChanged: (v) => setState(() => _featured = v),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.acceptRatings),
+              value: _ratings,
+              onChanged: (v) => setState(() => _ratings = v),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                TextButton(onPressed: _busy ? null : _delete, child: Text(l10n.delete)),
+                const Spacer(),
+                FilledButton(onPressed: _busy ? null : _save, child: Text(l10n.save)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

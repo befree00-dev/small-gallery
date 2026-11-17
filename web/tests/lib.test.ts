@@ -69,10 +69,15 @@ describe('messages', () => {
 
 describe('groupByRoom', () => {
   const room = (id: string, sort_order: number): Room => ({ id, title: id, title_en: null, statement: '', statement_en: null, sort_order });
-  const work = (id: string, room_id: string) => ({ id, room_id }) as Artwork;
+  const work = (id: string, room_id: string, sort_order = 0) => ({ id, room_id, sort_order }) as Artwork;
+
+  it('orders works by their hanging order even if they arrive unsorted', () => {
+    const groups = groupByRoom([room('b', 1), room('a', 0)], [work('x2', 'a', 2), work('y', 'b', 0), work('x1', 'a', 1)]);
+    expect(groups.flatMap((g) => g.artworks.map((w) => w.id))).toEqual(['x1', 'x2', 'y']);
+  });
 
   it('keeps room order and drops empty rooms', () => {
-    const groups = groupByRoom([room('spring', 0), room('empty', 1), room('still', 2)], [work('a', 'still'), work('b', 'spring'), work('c', 'spring')]);
+    const groups = groupByRoom([room('spring', 0), room('empty', 1), room('still', 2)], [work('a', 'still'), work('b', 'spring', 0), work('c', 'spring', 1)]);
     expect(groups.map((g) => [g.room.id, g.artworks.map((a) => a.id)])).toEqual([
       ['spring', ['b', 'c']],
       ['still', ['a']],
@@ -103,5 +108,16 @@ describe('originFrom', () => {
     expect(originFrom('a.example, proxy.internal', 'https, http', 'https://fallback.example')).toBe('https://a.example');
     expect(originFrom('localhost:3000', null, 'https://fallback.example')).toBe('http://localhost:3000');
     expect(originFrom(null, null, 'https://fallback.example')).toBe('https://fallback.example');
+  });
+});
+
+describe('neighbors', () => {
+  it('finds the works on either side', async () => {
+    const { neighbors } = await import('../lib/data');
+    const list = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+    expect(neighbors(list, 'b')).toEqual({ index: 1, prev: { id: 'a' }, next: { id: 'c' } });
+    expect(neighbors(list, 'a')).toEqual({ index: 0, prev: null, next: { id: 'b' } });
+    expect(neighbors(list, 'c')).toEqual({ index: 2, prev: { id: 'b' }, next: null });
+    expect(neighbors(list, 'x')).toEqual({ index: -1, prev: null, next: null });
   });
 });

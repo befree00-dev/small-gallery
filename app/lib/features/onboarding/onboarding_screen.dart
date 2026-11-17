@@ -56,7 +56,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _error = null;
     });
     try {
-      await ref.read(repositoryProvider).createGallery(
+      await ref
+          .read(repositoryProvider)
+          .createGallery(
             handle: normalizeHandle(_handle.text),
             title: _title.text.trim(),
             field: _field,
@@ -97,17 +99,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                     ),
-                  Row(children: [
-                    if (_step > 0)
-                      OutlinedButton(onPressed: () => setState(() => _step--), child: Text(l10n.back)),
-                    const Spacer(),
-                    FilledButton(
-                      onPressed: _busy || (_step == 1 && !_step2Valid)
-                          ? null
-                          : () => _step < steps.length - 1 ? setState(() => _step++) : _finish(),
-                      child: Text(_step < steps.length - 1 ? l10n.next : l10n.openGallery),
-                    ),
-                  ]),
+                  Row(
+                    children: [
+                      if (_step > 0) OutlinedButton(onPressed: () => setState(() => _step--), child: Text(l10n.back)),
+                      const Spacer(),
+                      FilledButton(
+                        onPressed: _busy || (_step == 1 && !_step2Valid)
+                            ? null
+                            : () => _step < steps.length - 1 ? setState(() => _step++) : _finish(),
+                        child: Text(_step < steps.length - 1 ? l10n.next : l10n.openGallery),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -125,17 +128,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ArtField.illustration: l10n.fieldIllustration,
       ArtField.other: l10n.fieldOther,
     };
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(l10n.stepField, style: serifTitle.copyWith(fontSize: 22)),
-      const SizedBox(height: 16),
-      RadioGroup<ArtField>(
-        groupValue: _field,
-        onChanged: (v) => setState(() => _field = v!),
-        child: Column(children: [
-          for (final e in options.entries) RadioListTile<ArtField>(value: e.key, title: Text(e.value)),
-        ]),
-      ),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.stepField, style: serifTitle.copyWith(fontSize: 22)),
+        const SizedBox(height: 16),
+        RadioGroup<ArtField>(
+          groupValue: _field,
+          onChanged: (v) => setState(() => _field = v!),
+          child: Column(
+            children: [for (final e in options.entries) RadioListTile<ArtField>(value: e.key, title: Text(e.value))],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _nameStep() {
@@ -147,27 +153,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     } else if (_handleAvailable == false) {
       helper = l10n.handleTaken;
     }
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      TextField(
-        controller: _title,
-        decoration: InputDecoration(labelText: l10n.galleryTitle),
-        maxLength: 60,
-        onChanged: (_) => setState(() {}),
-      ),
-      const SizedBox(height: 12),
-      TextField(
-        controller: _handle,
-        decoration: InputDecoration(
-          labelText: l10n.galleryAddress,
-          prefixText: '$siteHost/@',
-          helperText: l10n.handleRule,
-          errorText: helper,
-          suffixIcon: _handleAvailable == true ? const Icon(Icons.check, color: Palette.accent) : null,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: _title,
+          decoration: InputDecoration(labelText: l10n.galleryTitle),
+          maxLength: 60,
+          onChanged: (_) => setState(() {}),
         ),
-        autocorrect: false,
-        onChanged: _onHandleChanged,
-      ),
-    ]);
+        const SizedBox(height: 12),
+        TextField(
+          controller: _handle,
+          decoration: InputDecoration(
+            labelText: l10n.galleryAddress,
+            prefixText: '$siteHost/@',
+            helperText: l10n.handleRule,
+            errorText: helper,
+            suffixIcon: _handleAvailable == true ? const Icon(Icons.check, color: Palette.accent) : null,
+          ),
+          autocorrect: false,
+          onChanged: _onHandleChanged,
+        ),
+      ],
+    );
   }
 
   Widget _themeStep() {
@@ -177,19 +186,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       GalleryTheme.dark: l10n.themeDark,
       GalleryTheme.wood: l10n.themeWood,
     };
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(l10n.theme, style: serifTitle.copyWith(fontSize: 22)),
-      const SizedBox(height: 16),
-      Wrap(spacing: 12, runSpacing: 12, children: [
-        for (final t in GalleryTheme.values)
-          _ThemeSwatch(
-            name: names[t]!,
-            colors: galleryColors(t),
-            selected: _theme == t,
-            onTap: () => setState(() => _theme = t),
-          ),
-      ]),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.theme, style: serifTitle.copyWith(fontSize: 22)),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final t in GalleryTheme.values)
+              _ThemeSwatch(
+                name: names[t]!,
+                colors: galleryColors(t),
+                selected: _theme == t,
+                onTap: () => setState(() => _theme = t),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -218,14 +234,22 @@ class _ThemeSwatch extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: selected ? Palette.accent : Palette.line, width: selected ? 2 : 1),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              height: 64,
-              decoration: BoxDecoration(border: Border.all(color: colors.frame, width: 4), color: const Color(0xFFDFE7EE)),
-            ),
-            const SizedBox(height: 8),
-            ExcludeSemantics(child: Text(name, style: TextStyle(color: colors.ink, fontSize: 13))),
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  border: Border.all(color: colors.frame, width: 4),
+                  color: const Color(0xFFDFE7EE),
+                ),
+              ),
+              const SizedBox(height: 8),
+              ExcludeSemantics(
+                child: Text(name, style: TextStyle(color: colors.ink, fontSize: 13)),
+              ),
+            ],
+          ),
         ),
       ),
     );

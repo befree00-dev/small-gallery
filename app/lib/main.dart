@@ -25,15 +25,17 @@ Future<void> main() async {
   }
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
   final prefs = await SharedPreferences.getInstance();
-  runApp(ProviderScope(
-    overrides: [
-      prefsProvider.overrideWithValue(prefs),
-      repositoryProvider.overrideWithValue(
-        SupabaseGalleryRepository(Supabase.instance.client, prefs, oauthRedirect: oauthRedirect),
-      ),
-    ],
-    child: const SmallGalleryApp(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [
+        prefsProvider.overrideWithValue(prefs),
+        repositoryProvider.overrideWithValue(
+          SupabaseGalleryRepository(Supabase.instance.client, prefs, oauthRedirect: oauthRedirect),
+        ),
+      ],
+      child: const SmallGalleryApp(),
+    ),
+  );
 }
 
 /// What is wrong with the build-time settings, or null when they look usable.
@@ -67,13 +69,13 @@ class _MissingConfigApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: SelectableText(problem, textAlign: TextAlign.center),
-            ),
-          ),
+    home: Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: SelectableText(problem, textAlign: TextAlign.center),
         ),
-      );
+      ),
+    ),
+  );
 }

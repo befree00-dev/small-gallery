@@ -18,7 +18,10 @@ void main() {
 
   test('catches missing or malformed addresses', () {
     expect(configProblem(url: '', key: '', site: site), contains('not set'));
-    expect(configProblem(url: 'qlnwtxxmoifwtbxtlwtd.supabase.co', key: 'sb_publishable_abc', site: site), contains('SUPABASE_URL'));
+    expect(
+      configProblem(url: 'qlnwtxxmoifwtbxtlwtd.supabase.co', key: 'sb_publishable_abc', site: site),
+      contains('SUPABASE_URL'),
+    );
     expect(configProblem(url: url, key: 'sb_publishable_abc', site: 'https://실제주소.vercel.app'), contains('SITE_URL'));
     expect(configProblem(url: url, key: 'sb_publishable_abc', site: 'vercel.app'), contains('SITE_URL'));
   });

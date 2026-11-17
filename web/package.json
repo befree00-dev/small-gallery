@@ -9,7 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "e2e": "node e2e/studio.e2e.mjs"
+    "e2e": "node e2e/studio.e2e.mjs",
+    "e2e:visitor": "node e2e/visitor.e2e.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",
