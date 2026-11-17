@@ -2,14 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-import { isLocale, locales, messages } from '@/lib/i18n';
-import { siteUrl } from '@/lib/supabase';
+import { isLocale, messages } from '@/lib/i18n';
+import { siteOrigin } from '@/lib/site';
 
 import '../globals.css';
-
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -17,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: { default: 'Small Gallery', template: '%s · Small Gallery' },
     description: t.intro,
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(await siteOrigin()),
   };
 }
 

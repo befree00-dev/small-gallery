@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { isLocale, messages, parseHandle } from '@/lib/i18n';
-import { siteHost } from '@/lib/supabase';
+import { siteOrigin } from '@/lib/site';
 
 export default async function Home({
   params,
@@ -14,6 +14,7 @@ export default async function Home({
   const locale = isLocale(raw) ? raw : 'ko';
   const t = messages(locale);
   const { handle } = await searchParams;
+  const siteHost = new URL(await siteOrigin()).host;
 
   // The address form submits here as ?handle=…; send valid ones to the gallery.
   const parsed = handle ? parseHandle(handle.split('/').pop() ?? '') : null;

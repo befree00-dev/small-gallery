@@ -95,3 +95,13 @@ describe('API embeds', () => {
     expect(source).not.toMatch(/profiles\(/);
   });
 });
+
+describe('originFrom', () => {
+  it('uses the address the visitor requested', async () => {
+    const { originFrom } = await import('../lib/site');
+    expect(originFrom('small-gallery-vert.vercel.app', 'https', 'https://fallback.example')).toBe('https://small-gallery-vert.vercel.app');
+    expect(originFrom('a.example, proxy.internal', 'https, http', 'https://fallback.example')).toBe('https://a.example');
+    expect(originFrom('localhost:3000', null, 'https://fallback.example')).toBe('http://localhost:3000');
+    expect(originFrom(null, null, 'https://fallback.example')).toBe('https://fallback.example');
+  });
+});

@@ -6,7 +6,8 @@ import { CopyLink, ProtectedImage, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
 import { getArtworks, getComments, getGallery, getRooms, groupByRoom } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
-import { imageUrl, siteHost, siteUrl } from '@/lib/supabase';
+import { siteOrigin } from '@/lib/site';
+import { imageUrl } from '@/lib/supabase';
 
 type Params = Promise<{ locale: string; handle: string }>;
 
@@ -50,6 +51,8 @@ export default async function GalleryPage({ params }: { params: Params }) {
   ]);
   const groups = groupByRoom(rooms, artworks);
   const other: Locale = locale === 'ko' ? 'en' : 'ko';
+  const origin = await siteOrigin();
+  const siteHost = new URL(origin).host;
 
   return (
     <main className={`page theme-${gallery.theme}`}>
@@ -59,7 +62,7 @@ export default async function GalleryPage({ params }: { params: Params }) {
           <span className="address">{siteHost}/@{gallery.handle}</span>
           <div className="actions">
             <a className="btn btn-quiet" href={`/${other}/@${gallery.handle}`} hrefLang={other}>{t.language}</a>
-            <CopyLink url={`${siteUrl}/@${gallery.handle}`} locale={locale} />
+            <CopyLink url={`${origin}/@${gallery.handle}`} locale={locale} />
           </div>
         </header>
 
