@@ -65,7 +65,7 @@ class _GalleryViewState extends ConsumerState<_GalleryView> {
       appBar: AppBar(
         backgroundColor: colors.ground,
         foregroundColor: colors.ink,
-        title: Text('smallgallery.app/@${g.handle}', style: TextStyle(fontSize: 13, color: colors.muted)),
+        title: Text('$siteHost/@${g.handle}', style: TextStyle(fontSize: 13, color: colors.muted)),
         actions: [
           TextButton(
             onPressed: () => ref.read(localeProvider.notifier).set(Locale(lang == 'ko' ? 'en' : 'ko')),

@@ -23,3 +23,7 @@ export function browserClient(): SupabaseClient {
 export function imageUrl(path: string): string {
   return `${url}/storage/v1/object/public/artworks/${path.split('/').map(encodeURIComponent).join('/')}`;
 }
+
+/** Public address of this site, e.g. https://small-gallery.vercel.app */
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://smallgallery.app').replace(/\/$/, '');
+export const siteHost = new URL(siteUrl).host;

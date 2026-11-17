@@ -159,7 +159,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         controller: _handle,
         decoration: InputDecoration(
           labelText: l10n.galleryAddress,
-          prefixText: 'smallgallery.app/@',
+          prefixText: '$siteHost/@',
           helperText: l10n.handleRule,
           errorText: helper,
           suffixIcon: _handleAvailable == true ? const Icon(Icons.check, color: Palette.accent) : null,

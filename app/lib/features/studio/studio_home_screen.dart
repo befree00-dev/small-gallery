@@ -48,7 +48,7 @@ class StudioHomeScreen extends ConsumerWidget {
           builder: (list) => ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
             children: [
-              Text('smallgallery.app/@${gallery.handle}', style: const TextStyle(color: Palette.muted, fontSize: 13)),
+              Text('$siteHost/@${gallery.handle}', style: const TextStyle(color: Palette.muted, fontSize: 13)),
               const SizedBox(height: 4),
               Text(
                 l10n.galleryStats(list.fold(0, (s, r) => s + r.artworkCount), list.length),

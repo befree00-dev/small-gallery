@@ -93,8 +93,15 @@ String visibilityLabel(AppLocalizations l10n, Audience v) => switch (v) {
       Audience.private => l10n.visibilityPrivate,
     };
 
+/// Where the web gallery is deployed. Set at build time:
+///   --dart-define=SITE_URL=https://your-site.vercel.app
+const siteUrl = String.fromEnvironment('SITE_URL', defaultValue: 'https://smallgallery.app');
+
+/// The site address without scheme, for display: "your-site.vercel.app".
+final siteHost = Uri.parse(siteUrl).host;
+
 /// Address visitors open in a browser. The web gallery serves it.
-String publicGalleryUrl(String handle) => 'https://smallgallery.app/@$handle';
+String publicGalleryUrl(String handle) => '$siteUrl/@$handle';
 
 /// Wide layouts (desktop windows, tablets) use a navigation rail instead of a bottom bar.
 bool isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= 900;

@@ -52,7 +52,7 @@
 ```bash
 cd app
 flutter pub get
-flutter run --dart-define=SUPABASE_URL=https://xxxx.supabase.co --dart-define=SUPABASE_ANON_KEY=your-anon-key
+flutter run --dart-define=SUPABASE_URL=https://xxxx.supabase.co --dart-define=SUPABASE_ANON_KEY=your-anon-key --dart-define=SITE_URL=https://your-site.vercel.app
 ```
 
 플랫폼별 빌드는 각 OS에서 합니다(`flutter build windows`, `flutter build macos`, `flutter build ios`, `flutter build appbundle`). iOS·macOS는 Xcode에서 서명 팀을 지정해야 합니다.
@@ -68,7 +68,7 @@ npm install
 npm run dev
 ```
 
-Vercel 등에 배포할 때 같은 환경 변수를 넣습니다. 앱이 공유하는 링크 형식은 `https://smallgallery.app/@handle`입니다(`app/lib/ui/common.dart`의 `publicGalleryUrl`).
+Vercel 등에 배포할 때 같은 환경 변수를 넣습니다. 앱이 복사해 주는 갤러리 링크는 `SITE_URL/@handle`입니다. 앱을 실행·빌드할 때 `--dart-define=SITE_URL=`에 웹 주소를 넣으세요(넣지 않으면 `https://smallgallery.app`).
 
 ## 테스트
 

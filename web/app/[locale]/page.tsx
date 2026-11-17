@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { isLocale, messages, parseHandle } from '@/lib/i18n';
+import { siteHost } from '@/lib/supabase';
 
 export default async function Home({
   params,
@@ -34,7 +35,7 @@ export default async function Home({
         <form action={`/${locale}`} method="get">
           <label htmlFor="handle" className="visually-hidden">{t.visitLabel}</label>
           <div className="prefix">
-            <span aria-hidden="true">smallgallery.app/@</span>
+            <span aria-hidden="true">{siteHost}/@</span>
             <input id="handle" name="handle" autoComplete="off" autoCapitalize="none" spellCheck={false} required defaultValue={handle ?? ''} />
           </div>
           <button className="btn btn-primary" type="submit">{t.visit}</button>

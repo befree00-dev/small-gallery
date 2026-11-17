@@ -6,7 +6,7 @@ import { CopyLink, ProtectedImage, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
 import { getArtworks, getComments, getGallery, getRooms, groupByRoom } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
-import { imageUrl } from '@/lib/supabase';
+import { imageUrl, siteHost, siteUrl } from '@/lib/supabase';
 
 type Params = Promise<{ locale: string; handle: string }>;
 
@@ -50,17 +50,16 @@ export default async function GalleryPage({ params }: { params: Params }) {
   ]);
   const groups = groupByRoom(rooms, artworks);
   const other: Locale = locale === 'ko' ? 'en' : 'ko';
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://smallgallery.app';
 
   return (
     <main className={`page theme-${gallery.theme}`}>
       <ViewTracker galleryId={gallery.id} />
       <div className="wrap">
         <header className="topbar">
-          <span className="address">smallgallery.app/@{gallery.handle}</span>
+          <span className="address">{siteHost}/@{gallery.handle}</span>
           <div className="actions">
             <a className="btn btn-quiet" href={`/${other}/@${gallery.handle}`} hrefLang={other}>{t.language}</a>
-            <CopyLink url={`${site}/@${gallery.handle}`} locale={locale} />
+            <CopyLink url={`${siteUrl}/@${gallery.handle}`} locale={locale} />
           </div>
         </header>
 

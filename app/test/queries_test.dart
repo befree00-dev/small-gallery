@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// PostgREST refuses an embed when two tables are linked more than one way.
 /// galleries and profiles are (owner_id, and blocked_authors), so each
-/// profiles embed must name its foreign key: profiles!<fkey>(...).
+/// profiles embed must name its foreign key: `profiles!<fkey>(...)`.
 void main() {
   test('every profiles embed names its foreign key', () {
     final source = File('lib/data/supabase_repository.dart').readAsStringSync();

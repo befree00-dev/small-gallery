@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { isLocale, locales, messages } from '@/lib/i18n';
+import { siteUrl } from '@/lib/supabase';
 
 import '../globals.css';
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: { default: 'Small Gallery', template: '%s · Small Gallery' },
     description: t.intro,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://smallgallery.app'),
+    metadataBase: new URL(siteUrl),
   };
 }
 
