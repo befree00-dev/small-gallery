@@ -1,0 +1,12 @@
+# Web
+web/node_modules/
+web/.next/
+web/next-env.d.ts
+web/*.tsbuildinfo
+web/.env*.local
+
+# Flutter (app/.gitignore covers the rest)
+app/build/
+app/.dart_tool/
+
+.DS_Store
