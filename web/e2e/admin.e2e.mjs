@@ -31,10 +31,13 @@ function makeState(admin) {
       { id: 'c2', body: '이건 좀 별로네요', status: 'pending', author_name: '익명', gallery_handle: 'jisu', artwork_title: null, created_at: '2026-11-18T03:00:00Z' },
     ],
     users: [
-      { id: 'u1', email: 'befree@example.com', display_name: '관리자', plan: 'free', is_admin: true, email_confirmed: true, created_at: '2026-11-01T01:00:00Z', last_sign_in_at: '2026-11-18T05:00:00Z', gallery_handle: null, artworks: '0' },
+      { id: USER.id, email: 'befree@example.com', display_name: '관리자', plan: 'free', is_admin: true, email_confirmed: true, created_at: '2026-11-01T01:00:00Z', last_sign_in_at: '2026-11-18T05:00:00Z', gallery_handle: null, artworks: '0' },
       { id: 'u2', email: 'jisu@example.com', display_name: '김지수', plan: 'plus', is_admin: false, email_confirmed: true, created_at: '2026-11-18T01:00:00Z', last_sign_in_at: null, gallery_handle: 'jisu', artworks: '24' },
+      { id: 'u4', email: 'other-admin@example.com', display_name: '운영2', plan: 'free', is_admin: true, email_confirmed: true, created_at: '2026-11-02T01:00:00Z', last_sign_in_at: null, gallery_handle: null, artworks: '0' },
       { id: 'u3', email: 'minho@example.com', display_name: '민호', plan: 'free', is_admin: false, email_confirmed: false, created_at: '2026-11-17T09:00:00Z', last_sign_in_at: null, gallery_handle: 'minho_photo', artworks: '3' },
     ],
+    log: [],
+    removed: [],
     reports: [
       { id: 'r1', target_type: 'comment', target_id: 'c2', reason: 'abuse', detail: '', reporter_name: '지수', target_label: '이건 좀 별로네요', gallery_handle: 'jisu', created_at: '2026-11-18T04:00:00Z' },
     ],
@@ -53,6 +56,11 @@ async function mock(page, state) {
       return json({ access_token: 't', token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, refresh_token: 'r', user: USER });
     }
     if (url.pathname.startsWith('/auth/v1/')) return json({});
+    if (url.pathname.startsWith('/storage/v1/object/') && req.method() === 'DELETE') {
+      const bucket = url.pathname.split('/').pop();
+      for (const p of req.postDataJSON()?.prefixes ?? []) state.removed.push(`${bucket}/${p}`);
+      return json([]);
+    }
     const fn = url.pathname.replace('/rest/v1/rpc/', '');
     const args = req.postDataJSON?.() ?? {};
     state.calls.push([fn, args]);
@@ -70,6 +78,19 @@ async function mock(page, state) {
       case 'admin_daily': return state.admin ? json(days) : denied();
       case 'admin_galleries': return json(state.galleries);
       case 'admin_comments': return json(state.comments);
+      case 'admin_action_log': return json(state.log);
+      case 'admin_delete_gallery': {
+        const g = state.galleries.find((x) => x.id === args.p_gallery_id);
+        state.galleries = state.galleries.filter((x) => x.id !== args.p_gallery_id);
+        state.log.unshift({ id: `l${state.log.length}`, admin_email: USER.email, action: 'delete_gallery', target: `@${g.handle}`, detail: {}, created_at: '2026-11-18T06:00:00Z' });
+        return json({ artworks: ['u2/a1/display.jpg', 'u2/a1/thumb.jpg'], originals: ['u2/a1/original'] });
+      }
+      case 'admin_delete_user': {
+        const u = state.users.find((x) => x.id === args.p_user_id);
+        state.users = state.users.filter((x) => x.id !== args.p_user_id);
+        state.log.unshift({ id: `l${state.log.length}`, admin_email: USER.email, action: 'delete_user', target: u.email, detail: {}, created_at: '2026-11-18T06:01:00Z' });
+        return json({ artworks: [], originals: [] });
+      }
       case 'admin_users': {
         if (!state.admin) return denied();
         const q = (args.p_search ?? '').toLowerCase();
@@ -149,7 +170,7 @@ try {
   const usersTop = await page.locator('#users').evaluate((el) => el.getBoundingClientRect().top);
   check(usersTop >= 0 && usersTop < 200, `the user list scrolls into view (top ${Math.round(usersTop)}px)`);
   const users = page.locator('#users');
-  check((await users.locator('tbody tr').count()) === 3, 'every user is listed');
+  check((await users.locator('tbody tr').count()) === 4, 'every user is listed');
   const jisu = users.locator('tr', { hasText: 'jisu@example.com' });
   check((await jisu.innerText()).includes('@jisu') && (await jisu.innerText()).includes('Plus') && (await jisu.innerText()).includes('24'), 'a user shows gallery, plan and works');
   check((await users.locator('tr', { hasText: 'minho@example.com' }).innerText()).includes('미인증'), 'unconfirmed emails are marked');
@@ -160,7 +181,7 @@ try {
   check((await users.getByRole('status').innerText()) === '1명', 'the count follows the search');
   await users.getByRole('searchbox').fill('');
   await page.waitForTimeout(400);
-  check((await users.locator('tbody tr').count()) === 3, 'clearing the search shows everyone again');
+  check((await users.locator('tbody tr').count()) === 4, 'clearing the search shows everyone again');
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/admin-users.png` });
 
   // Moderation.
@@ -176,6 +197,41 @@ try {
   await page.locator('tr', { hasText: '지수의 작은 정원' }).getByRole('button', { name: '비공개로' }).click();
   await page.locator('tr', { hasText: '지수의 작은 정원' }).getByRole('button', { name: '공개로' }).waitFor();
   check(state.calls.some(([fn, a]) => fn === 'admin_set_gallery_visibility' && a.p_gallery_id === 'g1' && a.p_visibility === 'private'), 'admins can take a gallery down');
+
+  // Deleting a gallery: the dialog only lets the exact address through.
+  const callsBefore = state.calls.length;
+  await page.getByRole('button', { name: '삭제 @jisu' }).click();
+  const dialog = page.getByRole('dialog', { name: '갤러리 @jisu 삭제' });
+  check(await dialog.isVisible(), 'deleting a gallery asks for confirmation');
+  const confirmButton = dialog.getByRole('button', { name: '영구 삭제' });
+  check(await confirmButton.isDisabled(), 'delete is blocked until the address is typed');
+  await dialog.getByLabel('확인을 위해 jisu 를 입력하세요').fill('jis');
+  check(await confirmButton.isDisabled(), 'a near miss is not enough');
+  await dialog.getByRole('button', { name: '취소' }).click();
+  check(!(await dialog.isVisible()) && !state.calls.slice(callsBefore).some(([fn]) => fn === 'admin_delete_gallery'), 'cancel deletes nothing');
+
+  await page.getByRole('button', { name: '삭제 @jisu' }).click();
+  await dialog.getByLabel('확인을 위해 jisu 를 입력하세요').fill('jisu');
+  if (SHOTS) await page.screenshot({ path: `${SHOTS}/admin-delete-dialog.png` });
+  await confirmButton.click();
+  await page.getByText('삭제했어요').waitFor();
+  check(state.calls.some(([fn, a]) => fn === 'admin_delete_gallery' && a.p_gallery_id === 'g1'), 'the gallery is deleted');
+  check(['artworks/u2/a1/display.jpg', 'artworks/u2/a1/thumb.jpg', 'originals/u2/a1/original'].every((f) => state.removed.includes(f)), 'its image files are removed from storage');
+  check(await page.locator('#galleries tr', { hasText: '지수의 작은 정원' }).waitFor({ state: 'detached', timeout: 5000 }).then(() => true, () => false), 'it leaves the gallery list');
+  check(await page.locator('#log tr', { hasText: '갤러리 삭제' }).isVisible(), 'the admin log records it');
+
+  // Deleting a user.
+  const usersSection = page.locator('#users');
+  check((await usersSection.locator('tr', { hasText: 'befree@example.com' }).innerText()).includes('나'), 'your own account is marked and cannot be deleted');
+  check((await usersSection.getByRole('button', { name: '삭제 other-admin@example.com' }).count()) === 0, 'other admins cannot be deleted');
+  await usersSection.getByRole('button', { name: '삭제 minho@example.com' }).click();
+  const userDialog = page.getByRole('dialog', { name: '가입자 minho@example.com 삭제' });
+  await userDialog.getByLabel('확인을 위해 minho@example.com 를 입력하세요').fill('minho@example.com');
+  await userDialog.getByRole('button', { name: '영구 삭제' }).click();
+  await usersSection.locator('tr', { hasText: 'minho@example.com' }).waitFor({ state: 'detached' });
+  check(state.calls.some(([fn, a]) => fn === 'admin_delete_user' && a.p_user_id === 'u3'), 'the user is deleted');
+  check(await page.locator('#log tr', { hasText: 'minho@example.com' }).isVisible(), 'the admin log names the deleted user');
+  if (SHOTS) await page.locator('#log').screenshot({ path: `${SHOTS}/admin-log.png` });
 
   // Phone width.
   await page.setViewportSize({ width: 390, height: 844 });

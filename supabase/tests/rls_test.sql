@@ -417,4 +417,82 @@ do $$ declare ok boolean := false; begin
   assert ok, 'anonymous callers cannot list users';
 end $$;
 
+-- Admin: deleting galleries and users -------------------------------------------
+:as_artist
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_delete_gallery('10000000-0000-0000-0000-000000000001');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'non-admins cannot delete galleries';
+end $$;
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_delete_user('00000000-0000-0000-0000-00000000000b');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'non-admins cannot delete users';
+end $$;
+
+:as_ops
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_delete_user('00000000-0000-0000-0000-0000000000c1');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'admins cannot delete themselves';
+end $$;
+
+:as_admin
+insert into public.admins (user_id) values ('00000000-0000-0000-0000-0000000000c2');
+:as_ops
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_delete_user('00000000-0000-0000-0000-0000000000c2');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'admins cannot delete another admin';
+end $$;
+
+do $$ declare files jsonb; begin
+  files := public.admin_delete_gallery('10000000-0000-0000-0000-000000000001');
+  assert jsonb_array_length(files->'artworks') = 200, 'display and thumbnail paths for every artwork';
+  assert jsonb_array_length(files->'originals') = 100, 'original paths for every artwork';
+  assert files->'originals' ? 'a/1/original', 'original path derived from the display path';
+  assert (select count(*) from public.admin_galleries()) = 0, 'gallery is gone';
+end $$;
+
+:as_admin
+do $$ begin
+  assert (select count(*) from public.rooms) = 0, 'its rooms are gone';
+  assert (select count(*) from public.artworks) = 0, 'its artworks are gone';
+  assert (select count(*) from public.comments) = 0, 'its comments are gone';
+  assert (select count(*) from public.ratings) = 0, 'its ratings are gone';
+  assert (select count(*) from public.view_stats) = 0, 'its view stats are gone';
+  assert (select count(*) from public.profiles where id = '00000000-0000-0000-0000-00000000000a') = 1, 'deleting a gallery keeps the account';
+end $$;
+
+:as_ops
+do $$ declare files jsonb; begin
+  files := public.admin_delete_user('00000000-0000-0000-0000-00000000000b');
+  assert jsonb_array_length(files->'artworks') = 0, 'a user without a gallery has no files';
+  assert (select count(*) from public.admin_users() where email = 'visitor@example.com') = 0, 'user is gone';
+end $$;
+
+:as_admin
+do $$ begin
+  assert (select count(*) from auth.users where id = '00000000-0000-0000-0000-00000000000b') = 0, 'auth account is removed';
+  assert (select count(*) from public.profiles where id = '00000000-0000-0000-0000-00000000000b') = 0, 'profile is removed';
+  assert (select count(*) from public.reports where reporter_id = '00000000-0000-0000-0000-00000000000b') = 0, 'their reports are removed';
+end $$;
+
+:as_ops
+do $$ begin
+  assert (select action from public.admin_action_log() limit 1) = 'delete_user', 'latest action is logged first';
+  assert (select target from public.admin_action_log() where action = 'delete_user') = 'visitor@example.com', 'log names the deleted user';
+  assert (select target from public.admin_action_log() where action = 'delete_gallery') = '@jisu', 'log names the deleted gallery';
+  assert (select (detail->>'artworks')::int from public.admin_action_log() where action = 'delete_gallery') = 100, 'log keeps what was deleted';
+  assert (select admin_email from public.admin_action_log() limit 1) = 'r1@example.com', 'log names the admin';
+  assert (select count(*) from public.admin_action_log() where action = 'hide_comment') = 1, 'earlier moderation is logged too';
+end $$;
+
+:as_visitor
+do $$ declare ok boolean := false; begin
+  begin perform * from public.admin_actions;
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'the admin log is not readable by users';
+end $$;
+
 \echo 'All RLS tests passed.'

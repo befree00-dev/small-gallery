@@ -363,3 +363,17 @@ table.data td .btn { min-height: 36px; padding: 0 12px; font-size: 13px; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 .admin-section { scroll-margin-top: 16px; }
+
+/* Admin: deleting */
+.btn-danger { background: #b3261e; border-color: #b3261e; color: #fff; font-weight: 500; }
+.btn-danger:hover { border-color: #8c1d18; background: #8c1d18; }
+.btn-danger-quiet { color: #b3261e; border-color: transparent; background: transparent; }
+.btn-danger-quiet:hover { border-color: #e7b4af; }
+dialog.confirm {
+  border: 0; border-radius: 14px; padding: 24px; width: min(480px, calc(100vw - 32px));
+  background: var(--surface); color: var(--ink); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+dialog.confirm::backdrop { background: rgba(29, 28, 26, 0.45); }
+dialog.confirm form { display: flex; flex-direction: column; gap: 14px; }
+dialog.confirm h2 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+dialog.confirm p { margin: 0; color: var(--ink-soft); font-size: 14px; }

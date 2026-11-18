@@ -142,3 +142,43 @@ export const setGalleryVisibility = (id: string, visibility: 'public' | 'private
   rpc<void>('admin_set_gallery_visibility', { p_gallery_id: id, p_visibility: visibility });
 export const resolveReport = (id: string, status: 'actioned' | 'dismissed') =>
   rpc<void>('admin_resolve_report', { p_report_id: id, p_status: status });
+
+export interface AdminAction {
+  id: string;
+  admin_email: string;
+  action: string;
+  target: string;
+  detail: Record<string, unknown>;
+  created_at: string;
+}
+
+export const actionLog = (limit = 50) => rpc<AdminAction[]>('admin_action_log', { p_limit: limit });
+
+interface Files {
+  artworks: string[];
+  originals: string[];
+}
+
+/** Removes a deleted gallery's or user's image files. Returns how many could not be removed. */
+async function removeFiles(files: Files): Promise<number> {
+  let failed = 0;
+  const storage = browserClient().storage;
+  for (const [bucket, paths] of [['artworks', files.artworks], ['originals', files.originals]] as const) {
+    // The Storage API takes up to 1,000 paths per call.
+    for (let i = 0; i < paths.length; i += 1000) {
+      const { error } = await storage.from(bucket).remove(paths.slice(i, i + 1000));
+      if (error) failed += Math.min(1000, paths.length - i);
+    }
+  }
+  return failed;
+}
+
+export async function deleteGallery(id: string): Promise<{ filesLeft: number }> {
+  const files = await rpc<Files>('admin_delete_gallery', { p_gallery_id: id });
+  return { filesLeft: await removeFiles(files) };
+}
+
+export async function deleteUser(id: string): Promise<{ filesLeft: number }> {
+  const files = await rpc<Files>('admin_delete_user', { p_user_id: id });
+  return { filesLeft: await removeFiles(files) };
+}

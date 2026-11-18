@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useSession } from '@/components/client';
+import { ConfirmDelete } from '@/components/admin/confirm-delete';
 import { DailyBars } from '@/components/admin/daily-bars';
 import { Logo } from '@/components/logo';
 import { AuthForm } from '@/components/studio/shell';
@@ -21,7 +22,12 @@ interface Data {
   comments: api.AdminComment[];
   reports: api.AdminReport[];
   users: api.AdminUser[];
+  log: api.AdminAction[];
 }
+
+type PendingDelete =
+  | { kind: 'gallery'; id: string; handle: string; works: number }
+  | { kind: 'user'; id: string; email: string; works: number };
 
 export default function AdminPage() {
   const params = useParams<{ locale: string }>();
@@ -42,15 +48,16 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     setError(false);
     try {
-      const [overview, days, galleries, comments, reports, users] = await Promise.all([
+      const [overview, days, galleries, comments, reports, users, log] = await Promise.all([
         api.overview(),
         api.daily(30),
         api.galleries(50),
         api.comments(50),
         api.reports(),
         api.users(),
+        api.actionLog(30),
       ]);
-      setData({ overview, days, galleries, comments, reports, users });
+      setData({ overview, days, galleries, comments, reports, users, log });
     } catch {
       setError(true);
     }
@@ -67,6 +74,19 @@ export default function AdminPage() {
     } catch {
       showToast(t.actionFailed);
     }
+  }
+
+  async function remove(p: PendingDelete) {
+    let message: string;
+    try {
+      const { filesLeft } = p.kind === 'gallery' ? await api.deleteGallery(p.id) : await api.deleteUser(p.id);
+      message = filesLeft > 0 ? t.filesLeft(filesLeft) : t.deleted;
+    } catch (e) {
+      message = String(e).includes('cannot_delete') ? t.cannotDeleteAdmin : t.actionFailed;
+    }
+    // Refresh first, so the message appears once the lists show the result.
+    await load();
+    showToast(message);
   }
 
   let body;
@@ -92,7 +112,7 @@ export default function AdminPage() {
   } else if (!data) {
     body = <p className="notice">{t.checking}</p>;
   } else {
-    body = <Dashboard data={data} locale={locale} t={t} act={act} />;
+    body = <Dashboard data={data} locale={locale} t={t} act={act} remove={remove} me={session.user.id} />;
   }
 
   return (
@@ -113,7 +133,22 @@ export default function AdminPage() {
   );
 }
 
-function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: AdminStrings; act: (f: () => Promise<void>) => void }) {
+function Dashboard({
+  data,
+  locale,
+  t,
+  act,
+  remove,
+  me,
+}: {
+  data: Data;
+  locale: Locale;
+  t: AdminStrings;
+  act: (f: () => Promise<void>) => void;
+  remove: (p: PendingDelete) => Promise<void>;
+  me: string;
+}) {
+  const [pending, setPending] = useState<PendingDelete | null>(null);
   const { overview: o } = data;
   const num = new Intl.NumberFormat(locale === 'ko' ? 'ko-KR' : 'en-US');
   const when = new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Seoul' });
@@ -191,7 +226,7 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
         )}
       </section>
 
-      <Users initial={data.users} locale={locale} t={t} />
+      <Users initial={data.users} locale={locale} t={t} me={me} onDelete={setPending} />
 
       <section id="galleries" aria-labelledby="galleries-title" className="admin-section">
         <h2 id="galleries-title" className="studio-h2">{t.galleries}</h2>
@@ -219,6 +254,13 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
                     ) : (
                       <button className="btn btn-quiet" onClick={() => act(() => api.setGalleryVisibility(g.id, 'private'))}>{t.takeDown}</button>
                     )}
+                    <button
+                      className="btn btn-danger-quiet"
+                      aria-label={`${t.delete} @${g.handle}`}
+                      onClick={() => setPending({ kind: 'gallery', id: g.id, handle: g.handle, works: g.artworks })}
+                    >
+                      {t.delete}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -255,11 +297,59 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
           </table>
         </div>
       </section>
+
+      <section id="log" aria-labelledby="log-title" className="admin-section">
+        <h2 id="log-title" className="studio-h2">{t.log}</h2>
+        {data.log.length === 0 ? (
+          <p className="notice">{t.noLog}</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="data">
+              <thead>
+                <tr><th scope="col">{t.when}</th><th scope="col">{t.action}</th><th scope="col">{t.target}</th><th scope="col">{t.by}</th></tr>
+              </thead>
+              <tbody>
+                {data.log.map((l) => (
+                  <tr key={l.id}>
+                    <td className="nowrap">{when.format(new Date(l.created_at))}</td>
+                    <td>{t.actions[l.action] ?? l.action}</td>
+                    <td className="clip">{l.target}</td>
+                    <td>{l.admin_email}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {pending && (
+        <ConfirmDelete
+          title={pending.kind === 'gallery' ? t.deleteGalleryTitle(pending.handle) : t.deleteUserTitle(pending.email)}
+          body={pending.kind === 'gallery' ? t.deleteGalleryBody(pending.works) : t.deleteUserBody(pending.works)}
+          word={pending.kind === 'gallery' ? pending.handle : pending.email}
+          t={t}
+          onConfirm={() => remove(pending)}
+          onClose={() => setPending(null)}
+        />
+      )}
     </>
   );
 }
 
-function Users({ initial, locale, t }: { initial: api.AdminUser[]; locale: Locale; t: AdminStrings }) {
+function Users({
+  initial,
+  locale,
+  t,
+  me,
+  onDelete,
+}: {
+  initial: api.AdminUser[];
+  locale: Locale;
+  t: AdminStrings;
+  me: string;
+  onDelete: (p: PendingDelete) => void;
+}) {
   const [query, setQuery] = useState('');
   const [list, setList] = useState(initial);
   const [error, setError] = useState(false);
@@ -303,6 +393,7 @@ function Users({ initial, locale, t }: { initial: api.AdminUser[]; locale: Local
                 <th scope="col">{t.email}</th><th scope="col">{t.name}</th><th scope="col">{t.gallery}</th>
                 <th scope="col" className="num">{t.works}</th><th scope="col">{t.plan}</th>
                 <th scope="col">{t.joined}</th><th scope="col">{t.lastSignIn}</th>
+                <th scope="col"><span className="visually-hidden">{t.delete}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -326,6 +417,21 @@ function Users({ initial, locale, t }: { initial: api.AdminUser[]; locale: Local
                   <td>{u.plan === 'plus' ? 'Plus' : 'Free'}</td>
                   <td className="nowrap">{when.format(new Date(u.created_at))}</td>
                   <td className="nowrap">{u.last_sign_in_at ? when.format(new Date(u.last_sign_in_at)) : <span className="meta">{t.never}</span>}</td>
+                  <td>
+                    {u.id === me ? (
+                      <span className="meta">{t.you}</span>
+                    ) : u.is_admin ? (
+                      <span className="meta" title={t.cannotDeleteAdmin}>—</span>
+                    ) : (
+                      <button
+                        className="btn btn-danger-quiet"
+                        aria-label={`${t.delete} ${u.email}`}
+                        onClick={() => onDelete({ kind: 'user', id: u.id, email: u.email, works: u.artworks })}
+                      >
+                        {t.delete}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
