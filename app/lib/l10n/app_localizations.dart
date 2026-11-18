@@ -1009,6 +1009,24 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'방문자에게 적용: {label}'**
   String appliesAs(String label);
+
+  /// No description provided for @themeFeed.
+  ///
+  /// In ko, this message translates to:
+  /// **'피드'**
+  String get themeFeed;
+
+  /// No description provided for @themeSalon.
+  ///
+  /// In ko, this message translates to:
+  /// **'살롱'**
+  String get themeSalon;
+
+  /// No description provided for @themeEditorial.
+  ///
+  /// In ko, this message translates to:
+  /// **'에디토리얼'**
+  String get themeEditorial;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

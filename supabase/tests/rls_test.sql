@@ -495,4 +495,16 @@ do $$ declare ok boolean := false; begin
   assert ok, 'the admin log is not readable by users';
 end $$;
 
+-- Themes ----------------------------------------------------------------------
+:as_admin
+insert into public.galleries (owner_id, handle, title, theme)
+values ('00000000-0000-0000-0000-0000000000c3', 'feedtest', '피드', 'feed');
+update public.galleries set theme = 'salon' where handle = 'feedtest';
+update public.galleries set theme = 'editorial' where handle = 'feedtest';
+do $$ declare ok boolean := false; begin
+  begin update public.galleries set theme = 'neon' where handle = 'feedtest';
+  exception when check_violation then ok := true; end;
+  assert ok, 'unknown themes are refused';
+end $$;
+
 \echo 'All RLS tests passed.'

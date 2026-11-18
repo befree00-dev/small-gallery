@@ -91,6 +91,24 @@ ThemeData buildTheme() {
     muted: const Color(0xFF5E5448),
     frame: const Color(0xFF8A6A4A),
   ),
+  GalleryTheme.feed => (
+    ground: const Color(0xFFFFFFFF),
+    ink: const Color(0xFF121212),
+    muted: const Color(0xFF6E6E6E),
+    frame: const Color(0xFFFAFAFA),
+  ),
+  GalleryTheme.salon => (
+    ground: const Color(0xFF1D2A24),
+    ink: const Color(0xFFF1EBDD),
+    muted: const Color(0xFFB9AE99),
+    frame: const Color(0xFF3D2A1C),
+  ),
+  GalleryTheme.editorial => (
+    ground: const Color(0xFFF3EFE6),
+    ink: const Color(0xFF161514),
+    muted: const Color(0xFF6A655C),
+    frame: const Color(0xFFFBF8F2),
+  ),
 };
 
 const serifTitle = TextStyle(fontFamily: 'serif', fontWeight: FontWeight.w600, letterSpacing: -0.4);

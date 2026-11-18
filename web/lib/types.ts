@@ -10,7 +10,7 @@ export interface Gallery {
   title_en: string | null;
   bio: string;
   bio_en: string | null;
-  theme: 'white' | 'dark' | 'wood';
+  theme: 'white' | 'dark' | 'wood' | 'feed' | 'salon' | 'editorial';
   visibility: Audience;
   rating_enabled: boolean;
   comment_policy: 'open' | 'approve' | 'off';

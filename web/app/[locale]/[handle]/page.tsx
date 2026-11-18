@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { CopyLink, OwnerLink, ProtectedImage, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
+import { EditorialLayout, FeedLayout, SalonLayout } from '@/components/gallery-layouts';
 import { getArtworks, getComments, getGallery, getRooms, groupByRoom, robotsFor } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
 import { siteOrigin } from '@/lib/site';
@@ -42,8 +43,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function GalleryPage({ params }: { params: Params }) {
+export default async function GalleryPage({ params, searchParams }: { params: Params; searchParams: Promise<{ room?: string }> }) {
   const { locale, gallery } = await load(params);
+  const { room: roomFilter } = await searchParams;
   const t = messages(locale);
   const [rooms, artworks, guestbook] = await Promise.all([
     getRooms(gallery.id),
@@ -68,6 +70,14 @@ export default async function GalleryPage({ params }: { params: Params }) {
           </div>
         </header>
 
+        {gallery.theme === 'feed' ? (
+          <FeedLayout gallery={gallery} groups={groups} locale={locale} t={t} roomFilter={roomFilter} />
+        ) : gallery.theme === 'salon' ? (
+          <SalonLayout gallery={gallery} groups={groups} locale={locale} t={t} />
+        ) : gallery.theme === 'editorial' ? (
+          <EditorialLayout gallery={gallery} groups={groups} locale={locale} t={t} />
+        ) : (
+        <>
         <section className="cover">
           {gallery.profiles?.display_name && <span className="artist">{gallery.profiles.display_name}</span>}
           <h1 className="title">{pick(gallery.title, gallery.title_en, locale)}</h1>
@@ -119,6 +129,8 @@ export default async function GalleryPage({ params }: { params: Params }) {
             </div>
           </section>
         ))}
+        </>
+        )}
 
         <Comments comments={guestbook} galleryId={gallery.id} artworkId={null} policy={gallery.comment_policy} locale={locale} />
       </div>

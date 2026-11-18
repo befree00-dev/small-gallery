@@ -497,4 +497,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String appliesAs(String label) {
     return 'Visitors get: $label.';
   }
+
+  @override
+  String get themeFeed => 'Feed';
+
+  @override
+  String get themeSalon => 'Salon';
+
+  @override
+  String get themeEditorial => 'Editorial';
 }

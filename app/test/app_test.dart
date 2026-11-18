@@ -119,6 +119,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('2 / 3 · 봄의 산책'), findsOneWidget);
   });
+
+  testWidgets('a feed-theme gallery shows works in a square grid', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final repo = FakeRepository()
+      ..gallery = const Gallery(
+        id: 'g1',
+        ownerId: artistId,
+        handle: 'jisu',
+        title: '지수의 작은 정원',
+        theme: GalleryTheme.feed,
+      );
+    final container = await pumpApp(tester, repo);
+    container.read(routerProvider).go('/g/jisu');
+    await tester.pumpAndSettle();
+    expect(find.byType(GridView), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('4월, 개천 옆 벚나무')), findsOneWidget);
+  });
 }
 
 class _FailingGalleryRepository extends FakeRepository {

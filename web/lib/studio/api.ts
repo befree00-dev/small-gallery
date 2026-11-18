@@ -8,7 +8,7 @@ import { ImageError, processImage } from './image';
 
 export type Audience = 'public' | 'unlisted' | 'private';
 export type Policy = 'open' | 'approve' | 'off';
-export type Theme = 'white' | 'dark' | 'wood';
+export type Theme = 'white' | 'dark' | 'wood' | 'feed' | 'salon' | 'editorial';
 export type Field = 'painting' | 'photo' | 'illustration' | 'other';
 
 export interface StudioGallery {

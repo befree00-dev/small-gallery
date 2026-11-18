@@ -185,6 +185,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       GalleryTheme.white: l10n.themeWhite,
       GalleryTheme.dark: l10n.themeDark,
       GalleryTheme.wood: l10n.themeWood,
+      GalleryTheme.feed: l10n.themeFeed,
+      GalleryTheme.salon: l10n.themeSalon,
+      GalleryTheme.editorial: l10n.themeEditorial,
     };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -150,13 +150,15 @@ class _GalleryViewState extends ConsumerState<_GalleryView> {
                   sliver: SliverToBoxAdapter(
                     child: AsyncBody(
                       value: works,
-                      builder: (list) => _Masonry(
-                        artworks: list,
-                        columns: MediaQuery.sizeOf(context).width >= 900 ? 3 : 2,
-                        ink: colors.ink,
-                        muted: colors.muted,
-                        onTap: (a) => context.push('/g/${g.handle}/a/${a.id}'),
-                      ),
+                      builder: (list) => g.theme == GalleryTheme.feed
+                          ? _SquareGrid(artworks: list, onTap: (a) => context.push('/g/${g.handle}/a/${a.id}'))
+                          : _Masonry(
+                              artworks: list,
+                              columns: MediaQuery.sizeOf(context).width >= 900 ? 3 : 2,
+                              ink: colors.ink,
+                              muted: colors.muted,
+                              onTap: (a) => context.push('/g/${g.handle}/a/${a.id}'),
+                            ),
                     ),
                   ),
                 ),
@@ -251,6 +253,39 @@ class _Masonry extends StatelessWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// The feed theme: a tight three-column grid of square crops.
+class _SquareGrid extends StatelessWidget {
+  const _SquareGrid({required this.artworks, required this.onTap});
+
+  final List<Artwork> artworks;
+  final ValueChanged<Artwork> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = context.lang;
+    return GridView.count(
+      crossAxisCount: 3,
+      mainAxisSpacing: 3,
+      crossAxisSpacing: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        for (final a in artworks)
+          Semantics(
+            button: true,
+            label: '${localized(a.title, a.titleEn, lang)}, ${context.l10n.like} ${a.likeCount}',
+            child: InkWell(
+              onTap: () => onTap(a),
+              child: ExcludeSemantics(
+                child: ArtworkImage(path: a.thumbPath, semanticLabel: ''),
+              ),
+            ),
+          ),
       ],
     );
   }

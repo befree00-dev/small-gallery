@@ -495,4 +495,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String appliesAs(String label) {
     return '방문자에게 적용: $label';
   }
+
+  @override
+  String get themeFeed => '피드';
+
+  @override
+  String get themeSalon => '살롱';
+
+  @override
+  String get themeEditorial => '에디토리얼';
 }

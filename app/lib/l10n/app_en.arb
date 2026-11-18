@@ -268,5 +268,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "themeFeed": "Feed",
+  "themeSalon": "Salon",
+  "themeEditorial": "Editorial"
 }

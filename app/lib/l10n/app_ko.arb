@@ -268,5 +268,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "themeFeed": "피드",
+  "themeSalon": "살롱",
+  "themeEditorial": "에디토리얼"
 }

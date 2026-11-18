@@ -23,7 +23,16 @@ enum CommentPolicy {
 enum GalleryTheme {
   white,
   dark,
-  wood;
+  wood,
+
+  /// Social-profile style: square grid.
+  feed,
+
+  /// Classic museum wall.
+  salon,
+
+  /// Art-magazine layout.
+  editorial;
 
   static GalleryTheme parse(String? value) =>
       GalleryTheme.values.firstWhere((v) => v.name == value, orElse: () => GalleryTheme.white);
