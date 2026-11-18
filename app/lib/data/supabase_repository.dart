@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -107,6 +109,27 @@ class SupabaseGalleryRepository implements GalleryRepository {
       provider == 'apple' ? OAuthProvider.apple : OAuthProvider.google,
       redirectTo: oauthRedirect,
     );
+  }
+
+  @override
+  Future<Set<String>> enabledProviders() async {
+    try {
+      // The project address and key, as the client already holds them.
+      final base = _client.rest.url.replaceFirst(RegExp(r'/rest/v1/?$'), '');
+      final key = _client.rest.headers['apikey'] ?? '';
+      final res = await http
+          .get(Uri.parse('$base/auth/v1/settings'), headers: {'apikey': key})
+          .timeout(const Duration(seconds: 8));
+      if (res.statusCode != 200) return {};
+      final external = (jsonDecode(res.body) as Map<String, dynamic>)['external'] as Map<String, dynamic>? ?? {};
+      return {
+        for (final p in const ['google', 'apple'])
+          if (external[p] == true) p,
+      };
+    } catch (e) {
+      debugPrint('[supabase] provider settings: $e');
+      return {};
+    }
   }
 
   @override

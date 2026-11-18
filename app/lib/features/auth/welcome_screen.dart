@@ -60,6 +60,16 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     }
   }
 
+  Future<void> _social(String provider) async {
+    setState(() => _message = null);
+    try {
+      // Opens Google or Apple in the browser; the app returns via app.smallgallery://login-callback.
+      await ref.read(repositoryProvider).signInWithProvider(provider);
+    } catch (_) {
+      if (mounted) setState(() => _message = context.l10n.authFailed);
+    }
+  }
+
   void _visit() {
     final handle = normalizeHandle(_handle.text);
     if (isValidHandle(handle)) context.push('/g/$handle');
@@ -68,6 +78,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final providers = ref.watch(enabledProvidersProvider).value ?? const <String>{};
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -136,16 +147,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       }),
                       child: Text(_signingUp ? l10n.haveAccount : l10n.needAccount),
                     ),
-                    const SizedBox(height: 8),
-                    OutlinedButton(
-                      onPressed: () => ref.read(repositoryProvider).signInWithProvider('google'),
-                      child: Text(l10n.continueWithGoogle),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton(
-                      onPressed: () => ref.read(repositoryProvider).signInWithProvider('apple'),
-                      child: Text(l10n.continueWithApple),
-                    ),
+                    for (final p in const ['google', 'apple'])
+                      if (providers.contains(p)) ...[
+                        const SizedBox(height: 8),
+                        _SocialButton(provider: p, onPressed: () => _social(p)),
+                      ],
                     const SizedBox(height: 32),
                     const Divider(),
                     const SizedBox(height: 24),
@@ -172,6 +178,31 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         ),
       ),
     );
+  }
+}
+
+/// "Continue with Google / Apple" with each company's mark, as their sign-in guidelines ask.
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({required this.provider, required this.onPressed});
+
+  final String provider;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final apple = provider == 'apple';
+    final label = apple ? l10n.continueWithApple : l10n.continueWithGoogle;
+    final mark = apple
+        ? const Icon(Icons.apple, size: 20, color: Colors.white)
+        : Image.asset('assets/brand/google_g.png', width: 18, height: 18);
+    final style = OutlinedButton.styleFrom(
+      minimumSize: const Size.fromHeight(48),
+      backgroundColor: apple ? Colors.black : null,
+      foregroundColor: apple ? Colors.white : null,
+      side: apple ? const BorderSide(color: Colors.black) : null,
+    );
+    return OutlinedButton.icon(onPressed: onPressed, style: style, icon: mark, label: Text(label));
   }
 }
 

@@ -507,4 +507,13 @@ do $$ declare ok boolean := false; begin
   assert ok, 'unknown themes are refused';
 end $$;
 
+-- Social sign-ins: the name comes from full_name / name.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000e1', 'kim@gmail.com', '{"full_name":"김민지","name":"Minji"}'),
+  ('00000000-0000-0000-0000-0000000000e2', 'abc123@privaterelay.appleid.com', '{}');
+do $$ begin
+  assert (select display_name from public.profiles where id = '00000000-0000-0000-0000-0000000000e1') = '김민지', 'Google full name becomes the profile name';
+  assert (select display_name from public.profiles where id = '00000000-0000-0000-0000-0000000000e2') = 'abc123', 'without a name, the email prefix is used';
+end $$;
+
 \echo 'All RLS tests passed.'

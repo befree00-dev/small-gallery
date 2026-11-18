@@ -9,6 +9,9 @@ import '../data/repository.dart';
 final repositoryProvider = Provider<GalleryRepository>((ref) => throw UnimplementedError('repositoryProvider'));
 final prefsProvider = Provider<SharedPreferences>((ref) => throw UnimplementedError('prefsProvider'));
 
+/// Google / Apple, once switched on in Supabase; the welcome screen shows only these.
+final enabledProvidersProvider = FutureProvider<Set<String>>((ref) => ref.watch(repositoryProvider).enabledProviders());
+
 final userIdProvider = StreamProvider<String?>((ref) async* {
   final repo = ref.watch(repositoryProvider);
   yield repo.currentUserId;

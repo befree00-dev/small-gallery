@@ -18,6 +18,9 @@ abstract interface class GalleryRepository {
     required String locale,
   });
   Future<void> signInWithProvider(String provider);
+
+  /// Social sign-ins switched on in Supabase ('google', 'apple'); empty when unknown.
+  Future<Set<String>> enabledProviders();
   Future<void> signOut();
   Future<Profile?> myProfile();
 

@@ -74,8 +74,14 @@ class FakeRepository implements GalleryRepository {
     return true;
   }
 
+  final providerSignIns = <String>[];
+  Set<String> providers = {'google', 'apple'};
+
   @override
-  Future<void> signInWithProvider(String provider) async {}
+  Future<void> signInWithProvider(String provider) async => providerSignIns.add(provider);
+
+  @override
+  Future<Set<String>> enabledProviders() async => providers;
 
   @override
   Future<void> signOut() async => signInAs(null);

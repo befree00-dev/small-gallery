@@ -24,6 +24,21 @@ export function browserClient(): SupabaseClient {
   return browser;
 }
 
+export type Provider = 'google' | 'apple';
+
+let providers: Promise<Provider[]> | null = null;
+
+/** Social sign-ins switched on in the Supabase dashboard (Authentication → Providers). */
+export function enabledProviders(): Promise<Provider[]> {
+  providers ??= fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
+    .then((r) => (r.ok ? r.json() : { external: {} }))
+    .then((s: { external?: Record<string, boolean> }) =>
+      (['google', 'apple'] as const).filter((p) => s.external?.[p] === true),
+    )
+    .catch(() => []);
+  return providers;
+}
+
 export function imageUrl(path: string): string {
   return `${url}/storage/v1/object/public/artworks/${path.split('/').map(encodeURIComponent).join('/')}`;
 }

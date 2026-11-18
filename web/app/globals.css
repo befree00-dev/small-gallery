@@ -551,3 +551,12 @@ dialog.confirm p { margin: 0; color: var(--ink-soft); font-size: 14px; }
 }
 .auth-banner[data-tone='warn'] { background: #7a2e12; }
 .auth-banner-close { background: none; border: 0; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+
+/* Google / Apple sign-in. */
+.oauth { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 16px; }
+.signin .oauth { max-width: 360px; }
+.oauth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin: 4px 0; }
+.oauth-or::before, .oauth-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.oauth-btn { gap: 10px; font-weight: 500; white-space: nowrap; }
+.oauth-apple { background: #000; border-color: #000; color: #fff; }
+.oauth-apple:hover { border-color: #000; filter: brightness(1.25); }

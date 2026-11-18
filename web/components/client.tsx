@@ -10,6 +10,7 @@ import { browserClient } from '@/lib/supabase';
 import { criteria, type Criterion, type Scores } from '@/lib/types';
 
 import { rememberReturn } from './auth-return';
+import { OAuthButtons } from './oauth-buttons';
 
 // Visitor-side interactions. The server renders the page; these attach behavior.
 
@@ -144,6 +145,7 @@ export function SignIn({ locale }: { locale: Locale }) {
 
   if (state === 'sent') return <p className="notice" role="status">{t.linkSent}</p>;
   return (
+    <div className="signin">
     <form onSubmit={submit} className="composer">
       <div className="field" style={{ flex: 1 }}>
         <label htmlFor="signin-email">{t.signInPrompt}</label>
@@ -157,6 +159,8 @@ export function SignIn({ locale }: { locale: Locale }) {
         </p>
       )}
     </form>
+    <OAuthButtons locale={locale} returnTo={typeof window === 'undefined' ? '/' : window.location.pathname + window.location.search} />
+    </div>
   );
 }
 

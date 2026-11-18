@@ -31,6 +31,7 @@ const work = (n, room, order, title) => ({
 const artworks = [work(33, id(22), 0, '창가의 레몬'), work(32, id(21), 1, '비 갠 골목'), work(31, id(21), 0, '4월, 개천 옆 벚나무')];
 const tables = { galleries: [gallery], rooms, artworks, comments: [], artwork_rating_stats: [] };
 const otpRequests = [];
+const authorizeRequests = [];
 const visitorUser = { id: id(77), aud: 'authenticated', role: 'authenticated', email: 'visitor@example.com', app_metadata: {}, user_metadata: {}, created_at: '2026-11-18T00:00:00Z' };
 const photo = readFileSync(new URL('./fixtures/camera-with-gps.jpg', import.meta.url));
 
@@ -71,6 +72,15 @@ const fake = createServer((req, res) => {
     return;
   }
   if (url.pathname === '/auth/v1/user') return send(200, visitorUser);
+  if (url.pathname === '/auth/v1/settings') return send(200, { external: { google: true, apple: true, github: false } });
+  if (url.pathname === '/auth/v1/authorize') {
+    // Stands in for Google: approve at once and return to Supabase's redirect target with a session.
+    authorizeRequests.push(Object.fromEntries(url.searchParams));
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    const tok = 'h.' + Buffer.from(JSON.stringify({ sub: id(77), exp })).toString('base64url') + '.s';
+    res.writeHead(302, { location: `${url.searchParams.get('redirect_to')}#access_token=${tok}&refresh_token=r2&expires_in=3600&expires_at=${exp}&token_type=bearer` });
+    return res.end();
+  }
   if (url.pathname.startsWith('/auth/v1/')) return send(200, {});
   const table = url.pathname.replace('/rest/v1/', '');
   const rows = filterRows(tables[table] ?? [], url.searchParams);
@@ -163,6 +173,24 @@ try {
   check(await visitor.getByText('로그인했어요').isVisible(), 'a message says they are signed in');
   check((await visitor.getByLabel('로그인하면 평가와 감상평을 남길 수 있어요').count()) === 0, 'the email form is replaced by the comment form');
   if (SHOTS) await visitor.screenshot({ path: `${SHOTS}/signed-in.png` });
+
+  // Google sign-in from a gallery returns to the same gallery, signed in.
+  const social = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await social.goto(`${BASE}/ko/@jisu`);
+  const google = social.getByRole('button', { name: 'Google로 계속하기' });
+  await google.waitFor({ timeout: 5000 }).catch(() => {});
+  check(await google.isVisible(), 'Google button shows once the provider is on');
+  check(await social.getByRole('button', { name: 'Apple로 계속하기' }).isVisible(), 'Apple button shows once the provider is on');
+  check(!(await social.evaluate(() => document.documentElement.scrollWidth > innerWidth)), 'sign-in buttons fit a phone');
+  if (SHOTS) await social.getByRole('button', { name: 'Apple로 계속하기' }).screenshot({ path: `${SHOTS}/oauth-apple.png` });
+  if (SHOTS) await social.locator('.signin').screenshot({ path: `${SHOTS}/oauth-buttons.png` });
+  await google.click();
+  await social.waitForURL(`${BASE}/ko/@jisu`, { timeout: 10000 }).catch(() => {});
+  check(authorizeRequests.at(-1)?.provider === 'google', 'Google is asked to sign the visitor in');
+  check(authorizeRequests.at(-1)?.redirect_to === `${BASE}/ko/@jisu`, 'and to send them back to the gallery');
+  await social.getByText('로그인했어요').waitFor({ timeout: 5000 }).catch(() => {});
+  check(await social.getByText('로그인했어요').isVisible(), 'back in the gallery, signed in');
+  check((await social.getByRole('button', { name: 'Google로 계속하기' }).count()) === 0, 'the sign-in buttons give way to the comment form');
 
   // When Supabase will not send the email, the visitor is told why.
   const busy = await browser.newPage({ viewport: { width: 1280, height: 900 } });

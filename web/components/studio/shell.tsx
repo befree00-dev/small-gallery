@@ -10,6 +10,7 @@ import type { Locale } from '@/lib/i18n';
 import * as api from '@/lib/studio/api';
 import { isValidHandle, normalizeHandle } from '@/lib/studio/image-utils';
 import { studioMessages, type StudioStrings } from '@/lib/studio/messages';
+import { OAuthButtons } from '@/components/oauth-buttons';
 import { browserClient } from '@/lib/supabase';
 
 interface Studio {
@@ -203,6 +204,7 @@ export function AuthForm({ locale, t }: { locale: Locale; t: StudioStrings }) {
       <button type="button" className="btn btn-quiet" onClick={() => { setMode(mode === 'signIn' ? 'signUp' : 'signIn'); setMessage(null); }}>
         {mode === 'signIn' ? t.needAccount : t.haveAccount}
       </button>
+      <OAuthButtons locale={locale} returnTo={typeof window === 'undefined' ? `/${locale}/studio` : window.location.pathname} />
     </form>
   );
 }

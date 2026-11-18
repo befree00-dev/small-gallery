@@ -9,9 +9,9 @@ import { browserClient, isConfigured } from '@/lib/supabase';
 const RETURN_KEY = 'sg_return_to';
 
 /** Where a visitor asked for a sign-in link, so the link brings them back there. */
-export function rememberReturn(path: string) {
+export function rememberReturn(path: string, method: 'email' | 'oauth' = 'email') {
   try {
-    localStorage.setItem(RETURN_KEY, JSON.stringify({ path, at: Date.now() }));
+    localStorage.setItem(RETURN_KEY, JSON.stringify({ path, method, at: Date.now() }));
   } catch {
     // Private mode: the link still signs them in on whatever page it opens.
   }
@@ -30,7 +30,17 @@ function takeReturn(): string | null {
   }
 }
 
-export type AuthOutcome = 'signedIn' | 'expired' | 'otherBrowser' | null;
+export type AuthOutcome = 'signedIn' | 'expired' | 'otherBrowser' | 'oauthFailed' | null;
+
+/** How the pending sign-in was started, without consuming it. */
+function pendingMethod(): 'email' | 'oauth' | null {
+  try {
+    const raw = localStorage.getItem(RETURN_KEY);
+    return raw ? ((JSON.parse(raw) as { method?: 'email' | 'oauth' }).method ?? 'email') : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Finishes a magic-link sign-in on whichever page the link opens, says how it went,
@@ -70,7 +80,15 @@ export function AuthReturn({ locale }: { locale: Locale }) {
       for (const k of ['code', 'error', 'error_code', 'error_description']) url.searchParams.delete(k);
       window.history.replaceState(null, '', url.pathname + url.search);
 
-      const result: AuthOutcome = ok ? 'signedIn' : kind === 'code' ? 'otherBrowser' : 'expired';
+      const viaOAuth = pendingMethod() === 'oauth';
+      const result: AuthOutcome = ok
+        ? 'signedIn'
+        : viaOAuth
+          ? 'oauthFailed'
+          : kind === 'code'
+            ? 'otherBrowser'
+            : 'expired';
+      if (!ok) takeReturn();
       const back = ok ? takeReturn() : null;
       if (back && back !== url.pathname + url.search) {
         try {
@@ -104,7 +122,12 @@ export function AuthReturn({ locale }: { locale: Locale }) {
   }, [outcome]);
 
   if (!outcome) return null;
-  const text = outcome === 'signedIn' ? t.signedIn : outcome === 'expired' ? t.linkExpired : t.linkOtherBrowser;
+  const text = {
+    signedIn: t.signedIn,
+    expired: t.linkExpired,
+    otherBrowser: t.linkOtherBrowser,
+    oauthFailed: t.oauthFailed,
+  }[outcome];
   return (
     <div className="auth-banner" role={outcome === 'signedIn' ? 'status' : 'alert'} data-tone={outcome === 'signedIn' ? 'ok' : 'warn'}>
       <span>{text}</span>

@@ -41,6 +41,23 @@ void main() {
     expect(find.text('업로드'), findsOneWidget, reason: 'studio navigation is shown');
   });
 
+  testWidgets('Google and Apple buttons show only once switched on, and start that sign-in', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final repo = FakeRepository()..providers = {'google'};
+    await pumpApp(tester, repo);
+    expect(find.text('Apple로 계속하기'), findsNothing, reason: 'Apple is not switched on yet');
+    await tester.tap(find.text('Google로 계속하기'));
+    await tester.pumpAndSettle();
+    expect(repo.providerSignIns, ['google']);
+  });
+
+  testWidgets('no social buttons before any provider is set up', (tester) async {
+    await pumpApp(tester, FakeRepository()..providers = {});
+    expect(find.text('Google로 계속하기'), findsNothing);
+    expect(find.text('Apple로 계속하기'), findsNothing);
+  });
+
   testWidgets('a new account is sent to onboarding', (tester) async {
     await pumpApp(tester, FakeRepository(userId: artistId)..gallery = null);
     expect(find.text('어떤 작품을 하시나요?'), findsOneWidget);
