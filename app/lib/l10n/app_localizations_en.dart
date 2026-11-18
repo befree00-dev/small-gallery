@@ -506,4 +506,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeEditorial => 'Editorial';
+
+  @override
+  String get statWorks => 'works';
+
+  @override
+  String get statRooms => 'rooms';
+
+  @override
+  String get statLikes => 'likes';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get exhibition => 'Exhibition';
 }

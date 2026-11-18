@@ -1027,6 +1027,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'에디토리얼'**
   String get themeEditorial;
+
+  /// No description provided for @statWorks.
+  ///
+  /// In ko, this message translates to:
+  /// **'작품'**
+  String get statWorks;
+
+  /// No description provided for @statRooms.
+  ///
+  /// In ko, this message translates to:
+  /// **'전시실'**
+  String get statRooms;
+
+  /// No description provided for @statLikes.
+  ///
+  /// In ko, this message translates to:
+  /// **'공감'**
+  String get statLikes;
+
+  /// No description provided for @all.
+  ///
+  /// In ko, this message translates to:
+  /// **'전체'**
+  String get all;
+
+  /// No description provided for @exhibition.
+  ///
+  /// In ko, this message translates to:
+  /// **'전시'**
+  String get exhibition;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

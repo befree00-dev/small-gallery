@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'data/models.dart';
@@ -110,5 +111,12 @@ ThemeData buildTheme() {
     frame: const Color(0xFFFBF8F2),
   ),
 };
+
+/// Off in tests, where fonts cannot be downloaded.
+bool useWebFonts = true;
+
+/// Noto Serif KR, the gallery serif the web uses; downloaded once, then cached.
+TextStyle serif(TextStyle style) =>
+    useWebFonts ? GoogleFonts.notoSerifKr(textStyle: style) : style.copyWith(fontFamily: 'serif');
 
 const serifTitle = TextStyle(fontFamily: 'serif', fontWeight: FontWeight.w600, letterSpacing: -0.4);

@@ -271,5 +271,10 @@
   },
   "themeFeed": "피드",
   "themeSalon": "살롱",
-  "themeEditorial": "에디토리얼"
+  "themeEditorial": "에디토리얼",
+  "statWorks": "작품",
+  "statRooms": "전시실",
+  "statLikes": "공감",
+  "all": "전체",
+  "exhibition": "전시"
 }

@@ -271,5 +271,10 @@
   },
   "themeFeed": "Feed",
   "themeSalon": "Salon",
-  "themeEditorial": "Editorial"
+  "themeEditorial": "Editorial",
+  "statWorks": "works",
+  "statRooms": "rooms",
+  "statLikes": "likes",
+  "all": "All",
+  "exhibition": "Exhibition"
 }

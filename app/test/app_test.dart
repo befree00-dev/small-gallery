@@ -120,22 +120,63 @@ void main() {
     expect(find.text('2 / 3 · 봄의 산책'), findsOneWidget);
   });
 
-  testWidgets('a feed-theme gallery shows works in a square grid', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(800, 1600));
+  Future<void> openThemed(WidgetTester tester, GalleryTheme theme, {Size size = const Size(1200, 3000)}) async {
+    await tester.binding.setSurfaceSize(size);
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final repo = FakeRepository()
-      ..gallery = const Gallery(
-        id: 'g1',
-        ownerId: artistId,
-        handle: 'jisu',
-        title: '지수의 작은 정원',
-        theme: GalleryTheme.feed,
-      );
+      ..gallery = Gallery(id: 'g1', ownerId: artistId, handle: 'jisu', title: '지수의 작은 정원', theme: theme);
+    repo.rooms_.add(const Room(id: 'r2', galleryId: 'g1', title: '작은 정물', sortOrder: 1));
+    repo.artworks_.addAll([_work('a3', 'r2', 0, '창가의 레몬'), _work('a2', 'r1', 1, '비 갠 골목')]);
     final container = await pumpApp(tester, repo);
     container.read(routerProvider).go('/g/jisu');
     await tester.pumpAndSettle();
+  }
+
+  testWidgets('a feed gallery shows a profile, room highlights and a square grid', (tester) async {
+    await openThemed(tester, GalleryTheme.feed);
     expect(find.byType(GridView), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('4월, 개천 옆 벚나무')), findsOneWidget);
+    expect(find.text('지수의 작은 정원'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('창가의 레몬')), findsOneWidget);
+
+    // A room highlight filters the grid to that room.
+    await tester.tap(find.bySemanticsLabel('작은 정물'));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('창가의 레몬')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('비 갠 골목')), findsNothing);
+
+    await tester.tap(find.bySemanticsLabel('전체'));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel(RegExp('비 갠 골목')), findsOneWidget);
+    expect(find.text('방명록'), findsOneWidget);
+  });
+
+  testWidgets('a salon gallery hangs every room with wall labels', (tester) async {
+    await openThemed(tester, GalleryTheme.salon);
+    expect(find.text('전시'), findsOneWidget);
+    expect(find.text('봄의 산책'), findsOneWidget);
+    expect(find.text('작은 정물'), findsOneWidget, reason: 'all rooms at once, no room chips');
+    expect(find.byType(ChoiceChip), findsNothing);
+    expect(find.text('창가의 레몬'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('창가의 레몬'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 3 · 작은 정물'), findsOneWidget);
+  });
+
+  testWidgets('an editorial gallery numbers chapters and works across rooms', (tester) async {
+    await openThemed(tester, GalleryTheme.editorial);
+    expect(find.text('01'), findsWidgets);
+    expect(find.text('02'), findsWidgets);
+    expect(find.bySemanticsLabel('03 창가의 레몬'), findsOneWidget, reason: 'numbering continues into room 2');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('themed layouts fit a phone screen without overflow', (tester) async {
+    for (final theme in [GalleryTheme.feed, GalleryTheme.salon, GalleryTheme.editorial]) {
+      await openThemed(tester, theme, size: const Size(390, 3000));
+      expect(tester.takeException(), isNull, reason: '$theme');
+    }
   });
 }
 

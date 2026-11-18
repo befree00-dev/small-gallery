@@ -504,4 +504,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get themeEditorial => '에디토리얼';
+
+  @override
+  String get statWorks => '작품';
+
+  @override
+  String get statRooms => '전시실';
+
+  @override
+  String get statLikes => '공감';
+
+  @override
+  String get all => '전체';
+
+  @override
+  String get exhibition => '전시';
 }
