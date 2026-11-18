@@ -20,6 +20,7 @@ interface Data {
   galleries: api.AdminGallery[];
   comments: api.AdminComment[];
   reports: api.AdminReport[];
+  users: api.AdminUser[];
 }
 
 export default function AdminPage() {
@@ -41,14 +42,15 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     setError(false);
     try {
-      const [overview, days, galleries, comments, reports] = await Promise.all([
+      const [overview, days, galleries, comments, reports, users] = await Promise.all([
         api.overview(),
         api.daily(30),
         api.galleries(50),
         api.comments(50),
         api.reports(),
+        api.users(),
       ]);
-      setData({ overview, days, galleries, comments, reports });
+      setData({ overview, days, galleries, comments, reports, users });
     } catch {
       setError(true);
     }
@@ -116,19 +118,32 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
   const num = new Intl.NumberFormat(locale === 'ko' ? 'ko-KR' : 'en-US');
   const when = new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Seoul' });
   const metrics = ['galleries', 'users', 'artworks', 'comments', 'ratings', 'likes', 'views'] as const;
+  const sectionOf: Partial<Record<(typeof metrics)[number], string>> = { users: 'users', galleries: 'galleries', comments: 'comments' };
 
   return (
     <>
       <section aria-labelledby="today-title">
         <h2 id="today-title" className="studio-h2">{t.todayOf(o.day)}</h2>
         <dl className="kpis">
-          {metrics.map((m) => (
-            <div key={m}>
-              <dt>{t.metrics[m]}</dt>
-              <dd className="kpi-today">{num.format(o[m].today)}</dd>
-              <dd className="meta">{t.total} {num.format(o[m].total)}</dd>
-            </div>
-          ))}
+          {metrics.map((m) => {
+            const target = sectionOf[m];
+            // Tiles with a list below link to it; the link stretches over the whole tile.
+            return (
+              <div key={m} className={target ? 'kpi-link' : undefined}>
+                <dt>
+                  {target ? (
+                    <a href={`#${target}`} title={t.goTo(t.metrics[m])}>
+                      {t.metrics[m]} <span className="kpi-go" aria-hidden="true">›</span>
+                    </a>
+                  ) : (
+                    t.metrics[m]
+                  )}
+                </dt>
+                <dd className="kpi-today">{num.format(o[m].today)}</dd>
+                <dd className="meta">{t.total} {num.format(o[m].total)}</dd>
+              </div>
+            );
+          })}
         </dl>
         {(o.pending_comments > 0 || o.open_reports > 0) && (
           <ul className="alerts">
@@ -176,7 +191,9 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
         )}
       </section>
 
-      <section aria-labelledby="galleries-title" className="admin-section">
+      <Users initial={data.users} locale={locale} t={t} />
+
+      <section id="galleries" aria-labelledby="galleries-title" className="admin-section">
         <h2 id="galleries-title" className="studio-h2">{t.galleries}</h2>
         <div className="table-wrap">
           <table className="data">
@@ -239,5 +256,82 @@ function Dashboard({ data, locale, t, act }: { data: Data; locale: Locale; t: Ad
         </div>
       </section>
     </>
+  );
+}
+
+function Users({ initial, locale, t }: { initial: api.AdminUser[]; locale: Locale; t: AdminStrings }) {
+  const [query, setQuery] = useState('');
+  const [list, setList] = useState(initial);
+  const [error, setError] = useState(false);
+  const when = new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Seoul' });
+  const num = new Intl.NumberFormat(locale === 'ko' ? 'ko-KR' : 'en-US');
+
+  useEffect(() => setList(initial), [initial]);
+
+  // Search on the server (emails never reach non-admins), shortly after typing stops.
+  useEffect(() => {
+    if (!query.trim()) {
+      setList(initial);
+      return;
+    }
+    const timer = setTimeout(() => {
+      api.users(query.trim()).then(
+        (rows) => { setList(rows); setError(false); },
+        () => setError(true),
+      );
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, initial]);
+
+  return (
+    <section id="users" aria-labelledby="users-title" className="admin-section">
+      <div className="section-head">
+        <h2 id="users-title" className="studio-h2">{t.users} · <span role="status">{t.userCount(list.length)}</span></h2>
+        <label className="search">
+          <span className="visually-hidden">{t.searchUsers}</span>
+          <input type="search" className="input" placeholder={t.searchUsers} value={query} onChange={(e) => setQuery(e.target.value)} />
+        </label>
+      </div>
+      {error && <p role="alert" className="notice">{t.error}</p>}
+      {list.length === 0 ? (
+        <p className="notice">{t.noUsers}</p>
+      ) : (
+        <div className="table-wrap">
+          <table className="data">
+            <thead>
+              <tr>
+                <th scope="col">{t.email}</th><th scope="col">{t.name}</th><th scope="col">{t.gallery}</th>
+                <th scope="col" className="num">{t.works}</th><th scope="col">{t.plan}</th>
+                <th scope="col">{t.joined}</th><th scope="col">{t.lastSignIn}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((u) => (
+                <tr key={u.id}>
+                  <td>
+                    {u.email}
+                    {u.is_admin && <span className="status" data-status="admin" style={{ marginLeft: 6 }}>{t.admin}</span>}
+                    <br />
+                    <span className="meta">{u.email_confirmed ? t.confirmed : t.unconfirmed}</span>
+                  </td>
+                  <td>{u.display_name}</td>
+                  <td>
+                    {u.gallery_handle ? (
+                      <a href={`/${locale}/@${u.gallery_handle}`} target="_blank" rel="noreferrer">@{u.gallery_handle}</a>
+                    ) : (
+                      <span className="meta">{t.noGallery}</span>
+                    )}
+                  </td>
+                  <td className="num">{num.format(u.artworks)}</td>
+                  <td>{u.plan === 'plus' ? 'Plus' : 'Free'}</td>
+                  <td className="nowrap">{when.format(new Date(u.created_at))}</td>
+                  <td className="nowrap">{u.last_sign_in_at ? when.format(new Date(u.last_sign_in_at)) : <span className="meta">{t.never}</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }

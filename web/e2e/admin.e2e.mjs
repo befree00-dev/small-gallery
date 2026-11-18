@@ -30,6 +30,11 @@ function makeState(admin) {
       { id: 'c1', body: '분홍빛이 정말 좋아요', status: 'visible', author_name: '한결', gallery_handle: 'jisu', artwork_title: '4월, 개천 옆 벚나무', created_at: '2026-11-18T02:00:00Z' },
       { id: 'c2', body: '이건 좀 별로네요', status: 'pending', author_name: '익명', gallery_handle: 'jisu', artwork_title: null, created_at: '2026-11-18T03:00:00Z' },
     ],
+    users: [
+      { id: 'u1', email: 'befree@example.com', display_name: '관리자', plan: 'free', is_admin: true, email_confirmed: true, created_at: '2026-11-01T01:00:00Z', last_sign_in_at: '2026-11-18T05:00:00Z', gallery_handle: null, artworks: '0' },
+      { id: 'u2', email: 'jisu@example.com', display_name: '김지수', plan: 'plus', is_admin: false, email_confirmed: true, created_at: '2026-11-18T01:00:00Z', last_sign_in_at: null, gallery_handle: 'jisu', artworks: '24' },
+      { id: 'u3', email: 'minho@example.com', display_name: '민호', plan: 'free', is_admin: false, email_confirmed: false, created_at: '2026-11-17T09:00:00Z', last_sign_in_at: null, gallery_handle: 'minho_photo', artworks: '3' },
+    ],
     reports: [
       { id: 'r1', target_type: 'comment', target_id: 'c2', reason: 'abuse', detail: '', reporter_name: '지수', target_label: '이건 좀 별로네요', gallery_handle: 'jisu', created_at: '2026-11-18T04:00:00Z' },
     ],
@@ -65,6 +70,11 @@ async function mock(page, state) {
       case 'admin_daily': return state.admin ? json(days) : denied();
       case 'admin_galleries': return json(state.galleries);
       case 'admin_comments': return json(state.comments);
+      case 'admin_users': {
+        if (!state.admin) return denied();
+        const q = (args.p_search ?? '').toLowerCase();
+        return json(q ? state.users.filter((u) => [u.email, u.display_name, u.gallery_handle].some((v) => (v ?? '').toLowerCase().includes(q))) : state.users);
+      }
       case 'admin_reports': return json(state.reports);
       case 'admin_set_comment_status':
         state.comments = state.comments.map((c) => (c.id === args.p_comment_id ? { ...c, status: args.p_status } : c));
@@ -131,6 +141,27 @@ try {
 
   await page.locator('figure.chart').first().getByText('표로 보기').click();
   check(await visible(page.locator('figure.chart').first().locator('table')), 'chart has a table view');
+
+  // Users: the tile opens the list.
+  await page.locator('.kpis').getByRole('link', { name: /가입자/ }).click();
+  await page.waitForTimeout(800);
+  check(page.url().endsWith('#users'), 'clicking the sign-ups tile goes to the user list');
+  const usersTop = await page.locator('#users').evaluate((el) => el.getBoundingClientRect().top);
+  check(usersTop >= 0 && usersTop < 200, `the user list scrolls into view (top ${Math.round(usersTop)}px)`);
+  const users = page.locator('#users');
+  check((await users.locator('tbody tr').count()) === 3, 'every user is listed');
+  const jisu = users.locator('tr', { hasText: 'jisu@example.com' });
+  check((await jisu.innerText()).includes('@jisu') && (await jisu.innerText()).includes('Plus') && (await jisu.innerText()).includes('24'), 'a user shows gallery, plan and works');
+  check((await users.locator('tr', { hasText: 'minho@example.com' }).innerText()).includes('미인증'), 'unconfirmed emails are marked');
+  check((await users.locator('tr', { hasText: 'befree@example.com' }).innerText()).includes('관리자'), 'admins are marked');
+  await users.getByRole('searchbox').fill('민호');
+  await page.waitForTimeout(600);
+  check((await users.locator('tbody tr').count()) === 1 && state.calls.some(([fn, a]) => fn === 'admin_users' && a.p_search === '민호'), 'search asks the server and narrows the list');
+  check((await users.getByRole('status').innerText()) === '1명', 'the count follows the search');
+  await users.getByRole('searchbox').fill('');
+  await page.waitForTimeout(400);
+  check((await users.locator('tbody tr').count()) === 3, 'clearing the search shows everyone again');
+  if (SHOTS) await page.screenshot({ path: `${SHOTS}/admin-users.png` });
 
   // Moderation.
   await page.locator('#reports').getByRole('button', { name: '숨기기' }).click();

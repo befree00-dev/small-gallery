@@ -115,6 +115,24 @@ export async function galleries(limit = 50): Promise<AdminGallery[]> {
   return rows.map((g) => ({ ...g, artworks: n(g.artworks), views: n(g.views) }));
 }
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  display_name: string | null;
+  plan: 'free' | 'plus' | null;
+  is_admin: boolean;
+  email_confirmed: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
+  gallery_handle: string | null;
+  artworks: number;
+}
+
+export async function users(search = '', limit = 200): Promise<AdminUser[]> {
+  const rows = await rpc<AdminUser[]>('admin_users', { p_limit: limit, p_search: search || null });
+  return rows.map((u) => ({ ...u, artworks: n(u.artworks) }));
+}
+
 export const comments = (limit = 50) => rpc<AdminComment[]>('admin_comments', { p_limit: limit });
 export const reports = () => rpc<AdminReport[]>('admin_reports');
 

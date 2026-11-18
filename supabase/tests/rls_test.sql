@@ -383,4 +383,37 @@ do $$ begin
   assert (select count(*) from public.admin_reports()) = 0, 'resolved reports leave the queue';
 end $$;
 
+-- Admin: user list --------------------------------------------------------------
+:as_admin
+update auth.users set email_confirmed_at = now(), last_sign_in_at = now()
+where id = '00000000-0000-0000-0000-00000000000a';
+
+:as_ops
+do $$ begin
+  assert (select count(*) from public.admin_users()) = 6, 'every signed-up user is listed';
+  assert (select gallery_handle from public.admin_users() where email = 'artist@example.com') = 'jisu', 'users show their gallery';
+  assert (select artworks from public.admin_users() where email = 'artist@example.com') = 100, 'users show their artwork count';
+  assert (select email_confirmed from public.admin_users() where email = 'artist@example.com'), 'confirmed email is shown';
+  assert not (select email_confirmed from public.admin_users() where email = 'r2@example.com'), 'unconfirmed email is shown';
+  assert (select is_admin from public.admin_users() where email = 'r1@example.com'), 'admins are marked';
+  assert (select count(*) from public.admin_users(100, 'ARTIST@')) = 1, 'search by email ignores case';
+  assert (select count(*) from public.admin_users(100, '지수')) = 1, 'search by name';
+  assert (select count(*) from public.admin_users(100, 'jisu')) = 1, 'search by gallery address';
+  assert (select count(*) from public.admin_users(2)) = 2, 'limit applies';
+end $$;
+
+:as_visitor
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_users();
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'non-admins cannot list users or their emails';
+end $$;
+
+:as_anon
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_users();
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'anonymous callers cannot list users';
+end $$;
+
 \echo 'All RLS tests passed.'
