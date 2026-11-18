@@ -149,13 +149,14 @@ class _ArtworkEditSheetState extends ConsumerState<_ArtworkEditSheet> {
               decoration: InputDecoration(labelText: l10n.artistNoteEn),
             ),
             const SizedBox(height: 12),
-            DropdownButtonFormField<Audience>(
-              initialValue: _visibility,
-              decoration: InputDecoration(labelText: l10n.visibility),
-              items: [
-                for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v))),
-              ],
-              onChanged: (v) => setState(() => _visibility = v!),
+            InnerVisibilityField(
+              value: _visibility,
+              parent: effectiveAudience([
+                ref.watch(myGalleryProvider).value?.visibility ?? Audience.public,
+                widget.rooms.where((r) => r.id == widget.artwork.roomId).firstOrNull?.visibility ?? Audience.public,
+              ]),
+              parentIsGallery: false,
+              onChanged: (v) => setState(() => _visibility = v),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

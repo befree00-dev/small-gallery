@@ -243,5 +243,30 @@
       }
     }
   },
-  "startsUnlisted": "At first only people with the link can see it, and it stays out of search engines. You can make it public in settings."
+  "startsUnlisted": "At first only people with the link can see it, and it stays out of search engines. You can make it public in settings.",
+  "followGallery": "Same as gallery (now: {label})",
+  "@followGallery": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "followRoom": "Same as room (now: {label})",
+  "@followRoom": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "privateOnlyMe": "Private (only me)",
+  "appliesAs": "Visitors get: {label}.",
+  "@appliesAs": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -167,6 +167,12 @@ await page.getByRole('link', { name: '갤러리' }).first().click();
 await page.getByRole('link', { name: /첫 번째 전시실/ }).click();
 await page.getByText('개천의 봄').waitFor();
 check(true, 'the room lists the uploaded work');
+const roomSelect = page.getByLabel('공개 범위', { exact: true }).first();
+check((await roomSelect.locator('option:checked').innerText()) === '갤러리와 같게 (지금: 링크가 있는 사람만)', 'the room says it follows the link-only gallery');
+check((await page.getByText('방문자에게 적용: 링크가 있는 사람만').count()) >= 1, 'the room spells out what visitors get');
+check((await roomSelect.locator('option').allInnerTexts()).every((o) => o !== '전체 공개'), 'no misleading "public" choice inside a link-only gallery');
+await roomSelect.selectOption('private');
+check(await page.getByText('방문자에게 적용: 비공개').first().isVisible(), 'choosing private updates what visitors get');
 await shot('6-room');
 
 // Sign-out stays reachable at the bottom of the menu, even after scrolling.

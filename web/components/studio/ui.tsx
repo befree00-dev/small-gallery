@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
+import type { Audience } from '@/lib/studio/api';
+import { effectiveVisibility } from '@/lib/studio/image-utils';
 import type { StudioStrings } from '@/lib/studio/messages';
 import { imageUrl } from '@/lib/supabase';
 
@@ -89,6 +91,41 @@ export function Toast({ message }: { message: string | null }) {
   return (
     <div className="toast" role="status" aria-live="polite">
       {message}
+    </div>
+  );
+}
+
+/**
+ * Visibility for a room or a work. Its "public" means "same as what it is in",
+ * so it is labelled that way, and the result for visitors is spelled out.
+ */
+export function InnerVisibilitySelect({
+  id,
+  value,
+  parent,
+  parentKind,
+  onChange,
+  t,
+}: {
+  id: string;
+  value: Audience;
+  parent: Audience;
+  parentKind: 'gallery' | 'room';
+  onChange: (v: Audience) => void;
+  t: StudioStrings;
+}) {
+  const follow = parentKind === 'gallery' ? t.followParent : t.followRoom;
+  // "Link only" narrows only a public parent; offer it then (or keep it if already chosen).
+  const showUnlisted = parent === 'public' || value === 'unlisted';
+  return (
+    <div className="field">
+      <label htmlFor={id}>{t.visibility}</label>
+      <select id={id} className="input" value={value} aria-describedby={`${id}-applies`} onChange={(e) => onChange(e.target.value as Audience)}>
+        <option value="public">{follow(t.visibilities[parent])}</option>
+        {showUnlisted && <option value="unlisted">{t.visibilities.unlisted}</option>}
+        <option value="private">{t.privateOnlyMe}</option>
+      </select>
+      <span id={`${id}-applies`} className="meta">{t.appliesAs(t.visibilities[effectiveVisibility(parent, value)])}</span>
     </div>
   );
 }

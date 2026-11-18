@@ -243,5 +243,30 @@
       }
     }
   },
-  "startsUnlisted": "처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요."
+  "startsUnlisted": "처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.",
+  "followGallery": "갤러리와 같게 (지금: {label})",
+  "@followGallery": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "followRoom": "전시실과 같게 (지금: {label})",
+  "@followRoom": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "privateOnlyMe": "비공개 (나만 보기)",
+  "appliesAs": "방문자에게 적용: {label}",
+  "@appliesAs": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  }
 }

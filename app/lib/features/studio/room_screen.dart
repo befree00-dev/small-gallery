@@ -115,7 +115,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
               onRetry: () => ref.invalidate(artworksProvider(widget.roomId)),
               builder: (_) => ReorderableListView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-                header: _header(l10n),
+                header: _header(l10n, gallery),
                 onReorderItem: _reorder,
                 children: [
                   for (final a in _order!)
@@ -161,7 +161,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     );
   }
 
-  Widget _header(AppLocalizations l10n) {
+  Widget _header(AppLocalizations l10n, Gallery gallery) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -181,11 +181,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
             decoration: InputDecoration(labelText: l10n.roomStatement),
           ),
           const SizedBox(height: 8),
-          DropdownButtonFormField<Audience>(
-            initialValue: _visibility,
-            decoration: InputDecoration(labelText: l10n.visibility),
-            items: [for (final v in Audience.values) DropdownMenuItem(value: v, child: Text(visibilityLabel(l10n, v)))],
-            onChanged: (v) => setState(() => _visibility = v!),
+          InnerVisibilityField(
+            value: _visibility,
+            parent: gallery.visibility,
+            parentIsGallery: true,
+            onChanged: (v) => setState(() => _visibility = v),
           ),
           const SizedBox(height: 20),
           if ((_order ?? const []).isEmpty)

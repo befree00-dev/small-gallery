@@ -477,4 +477,22 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get startsUnlisted => '처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.';
+
+  @override
+  String followGallery(String label) {
+    return '갤러리와 같게 (지금: $label)';
+  }
+
+  @override
+  String followRoom(String label) {
+    return '전시실과 같게 (지금: $label)';
+  }
+
+  @override
+  String get privateOnlyMe => '비공개 (나만 보기)';
+
+  @override
+  String appliesAs(String label) {
+    return '방문자에게 적용: $label';
+  }
 }

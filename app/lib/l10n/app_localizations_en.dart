@@ -479,4 +479,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startsUnlisted =>
       'At first only people with the link can see it, and it stays out of search engines. You can make it public in settings.';
+
+  @override
+  String followGallery(String label) {
+    return 'Same as gallery (now: $label)';
+  }
+
+  @override
+  String followRoom(String label) {
+    return 'Same as room (now: $label)';
+  }
+
+  @override
+  String get privateOnlyMe => 'Private (only me)';
+
+  @override
+  String appliesAs(String label) {
+    return 'Visitors get: $label.';
+  }
 }

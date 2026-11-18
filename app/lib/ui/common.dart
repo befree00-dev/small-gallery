@@ -113,3 +113,54 @@ String publicGalleryUrl(String handle) => '$siteUrl/@$handle';
 
 /// Wide layouts (desktop windows, tablets) use a navigation rail instead of a bottom bar.
 bool isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= 900;
+
+/// Visibility for a room or a work. Its "public" means "same as what it is in",
+/// so it is labelled that way, and what visitors get is spelled out below.
+class InnerVisibilityField extends StatelessWidget {
+  const InnerVisibilityField({
+    super.key,
+    required this.value,
+    required this.parent,
+    required this.parentIsGallery,
+    required this.onChanged,
+  });
+
+  final Audience value;
+  final Audience parent;
+  final bool parentIsGallery;
+  final ValueChanged<Audience> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final parentLabel = visibilityLabel(l10n, parent);
+    // "Link only" narrows only a public parent; offer it then (or keep it if already chosen).
+    final showUnlisted = parent == Audience.public || value == Audience.unlisted;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<Audience>(
+          initialValue: value,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: l10n.visibility),
+          items: [
+            DropdownMenuItem(
+              value: Audience.public,
+              child: Text(parentIsGallery ? l10n.followGallery(parentLabel) : l10n.followRoom(parentLabel)),
+            ),
+            if (showUnlisted) DropdownMenuItem(value: Audience.unlisted, child: Text(l10n.visibilityUnlisted)),
+            DropdownMenuItem(value: Audience.private, child: Text(l10n.privateOnlyMe)),
+          ],
+          onChanged: (v) => onChanged(v!),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6, left: 4),
+          child: Text(
+            l10n.appliesAs(visibilityLabel(l10n, effectiveAudience([parent, value]))),
+            style: const TextStyle(fontSize: 12, color: Palette.muted),
+          ),
+        ),
+      ],
+    );
+  }
+}

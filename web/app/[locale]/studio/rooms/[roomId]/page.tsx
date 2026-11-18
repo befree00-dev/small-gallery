@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useStudio } from '@/components/studio/shell';
-import { Loading, Thumb, Toast, useLoad, useToast } from '@/components/studio/ui';
+import { InnerVisibilitySelect, Loading, Thumb, Toast, useLoad, useToast } from '@/components/studio/ui';
 import * as api from '@/lib/studio/api';
 import { effectiveVisibility, moveItem } from '@/lib/studio/image-utils';
 
@@ -74,14 +74,14 @@ export default function RoomPage() {
             <label htmlFor="room-statement">{t.roomStatement}</label>
             <textarea id="room-statement" className="textarea" rows={3} maxLength={1000} value={room.statement} onChange={(e) => setRoom({ ...room, statement: e.target.value })} />
           </div>
-          <div className="field">
-            <label htmlFor="room-visibility">{t.visibility}</label>
-            <select id="room-visibility" className="input" value={room.visibility} onChange={(e) => setRoom({ ...room, visibility: e.target.value as api.Audience })}>
-              {(Object.keys(t.visibilities) as api.Audience[]).map((v) => (
-                <option key={v} value={v}>{t.visibilities[v]}</option>
-              ))}
-            </select>
-          </div>
+          <InnerVisibilitySelect
+            id="room-visibility"
+            value={room.visibility}
+            parent={gallery.visibility}
+            parentKind="gallery"
+            onChange={(v) => setRoom({ ...room, visibility: v })}
+            t={t}
+          />
           <div className="row">
             <button className="btn btn-quiet" onClick={remove}>{t.delete}</button>
             <button className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={save} disabled={!room.title.trim()}>{t.save}</button>
@@ -129,6 +129,7 @@ export default function RoomPage() {
                     {editing === a.id && (
                       <ArtworkEditor
                         artwork={a}
+                        parent={effectiveVisibility(gallery.visibility, room?.visibility ?? 'public')}
                         onSaved={(updated) => {
                           works.set(list.map((w) => (w.id === updated.id ? updated : w)));
                           setEditing(null);
@@ -154,10 +155,13 @@ export default function RoomPage() {
 
 function ArtworkEditor({
   artwork,
+  parent,
   onSaved,
   onDeleted,
 }: {
   artwork: api.StudioArtwork;
+  /** What the room it hangs in resolves to. */
+  parent: api.Audience;
   onSaved: (a: api.StudioArtwork) => void;
   onDeleted: () => void;
 }) {
@@ -215,14 +219,7 @@ function ArtworkEditor({
         <label htmlFor={id('note-en')}>{t.noteEn}</label>
         <textarea id={id('note-en')} className="textarea" rows={2} value={a.note_en ?? ''} onChange={(e) => setA({ ...a, note_en: e.target.value })} />
       </div>
-      <div className="field">
-        <label htmlFor={id('vis')}>{t.visibility}</label>
-        <select id={id('vis')} className="input" value={a.visibility} onChange={(e) => setA({ ...a, visibility: e.target.value as api.Audience })}>
-          {(Object.keys(t.visibilities) as api.Audience[]).map((v) => (
-            <option key={v} value={v}>{t.visibilities[v]}</option>
-          ))}
-        </select>
-      </div>
+      <InnerVisibilitySelect id={id('vis')} value={a.visibility} parent={parent} parentKind="room" onChange={(v) => setA({ ...a, visibility: v })} t={t} />
       <label className="check"><input type="checkbox" checked={a.is_featured} onChange={(e) => setA({ ...a, is_featured: e.target.checked })} /> {t.featured}</label>
       <label className="check"><input type="checkbox" checked={a.rating_enabled} onChange={(e) => setA({ ...a, rating_enabled: e.target.checked })} /> {t.acceptRatings}</label>
       {error && <p className="notice" role="alert">{error}</p>}

@@ -985,6 +985,30 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.'**
   String get startsUnlisted;
+
+  /// No description provided for @followGallery.
+  ///
+  /// In ko, this message translates to:
+  /// **'갤러리와 같게 (지금: {label})'**
+  String followGallery(String label);
+
+  /// No description provided for @followRoom.
+  ///
+  /// In ko, this message translates to:
+  /// **'전시실과 같게 (지금: {label})'**
+  String followRoom(String label);
+
+  /// No description provided for @privateOnlyMe.
+  ///
+  /// In ko, this message translates to:
+  /// **'비공개 (나만 보기)'**
+  String get privateOnlyMe;
+
+  /// No description provided for @appliesAs.
+  ///
+  /// In ko, this message translates to:
+  /// **'방문자에게 적용: {label}'**
+  String appliesAs(String label);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
