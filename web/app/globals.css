@@ -199,7 +199,19 @@ button, input, textarea { font: inherit; color: inherit; }
   flex: 1 1 220px; max-width: 100%; padding: 20px 16px; background: #efede7; border-right: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 16px;
 }
-@media (min-width: 900px) { .studio-nav { max-width: 260px; min-height: 100vh; } }
+@media (min-width: 900px) {
+  /* The menu stays put while the page scrolls, so sign-out is always reachable. */
+  .studio-nav { max-width: 260px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+}
+.studio-account { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px 8px 4px; border-top: 1px solid var(--line); }
+.studio-email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-signout { justify-content: flex-start; width: 100%; }
+@media (max-width: 899px) {
+  /* Phones: the menu sits above the page; keep sign-out on one compact row. */
+  .studio-account { flex-direction: row; align-items: center; justify-content: space-between; padding: 8px 0 0; }
+  .studio-email { flex: 1; min-width: 0; }
+  .studio-signout { width: auto; }
+}
 .studio-brand { display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
 .studio-brand strong { font-family: var(--serif); font-size: 18px; }
 .studio-nav nav { display: flex; flex-wrap: wrap; gap: 2px; }

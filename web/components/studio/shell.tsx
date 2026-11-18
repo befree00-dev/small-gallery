@@ -16,6 +16,7 @@ interface Studio {
   locale: Locale;
   t: StudioStrings;
   userId: string;
+  email: string;
   gallery: api.StudioGallery;
   setGallery: (g: api.StudioGallery) => void;
 }
@@ -70,7 +71,7 @@ export function StudioShell({ locale, children }: { locale: Locale; children: Re
     body = <CreateGallery userId={session.user.id} locale={locale} t={t} onCreated={setGallery} />;
   } else {
     return (
-      <StudioContext.Provider value={{ locale, t, userId: session.user.id, gallery: gallery!, setGallery }}>
+      <StudioContext.Provider value={{ locale, t, userId: session.user.id, email: session.user.email ?? '', gallery: gallery!, setGallery }}>
         <div className="studio">
           <StudioNav />
           <main className="studio-main">{children}</main>
@@ -93,7 +94,7 @@ export function StudioShell({ locale, children }: { locale: Locale; children: Re
 }
 
 function StudioNav() {
-  const { t, locale, gallery } = useStudio();
+  const { t, locale, gallery, email } = useStudio();
   const path = usePathname();
   const base = `/${locale}/studio`;
   const items = [
@@ -121,6 +122,18 @@ function StudioNav() {
       <a className="studio-link" href={`/${locale}/@${gallery.handle}`} target="_blank" rel="noreferrer">
         {t.viewAsVisitor} ↗
       </a>
+      {/* Pinned to the bottom of the menu, which stays on screen on wide layouts. */}
+      <div className="studio-account">
+        {email && <span className="meta studio-email" title={email}>{email}</span>}
+        <button type="button" className="btn studio-signout" onClick={() => browserClient().auth.signOut()}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3" />
+            <path d="M10 17l-5-5 5-5" />
+            <path d="M5 12h11" />
+          </svg>
+          {t.signOut}
+        </button>
+      </div>
     </aside>
   );
 }

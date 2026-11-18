@@ -5,7 +5,6 @@ import { useState, type FormEvent } from 'react';
 import { useStudio } from '@/components/studio/shell';
 import { Toast, useLoad, useToast } from '@/components/studio/ui';
 import * as api from '@/lib/studio/api';
-import { browserClient } from '@/lib/supabase';
 
 export default function SettingsPage() {
   const { t, gallery, setGallery, userId } = useStudio();
@@ -86,7 +85,6 @@ export default function SettingsPage() {
         </section>
       )}
 
-      <button className="btn" onClick={() => browserClient().auth.signOut()}>{t.signOut}</button>
       <Toast message={toast} />
     </>
   );

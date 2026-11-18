@@ -165,6 +165,20 @@ await page.getByText('개천의 봄').waitFor();
 check(true, 'the room lists the uploaded work');
 await shot('6-room');
 
+// Sign-out stays reachable at the bottom of the menu, even after scrolling.
+await page.getByRole('link', { name: '업로드' }).first().click();
+await page.locator('input[type=file]').setInputFiles('e2e/fixtures/camera-with-gps.jpg');
+await page.mouse.wheel(0, 5000);
+await page.waitForTimeout(300);
+const signOut = page.locator('.studio-nav').getByRole('button', { name: '로그아웃' });
+const inView = await signOut.evaluate((el) => {
+  const r = el.getBoundingClientRect();
+  return r.top >= 0 && r.bottom <= innerHeight;
+});
+check((await page.evaluate(() => scrollY)) > 0 && inView, 'sign-out is on screen after scrolling to the bottom');
+check((await page.locator('.studio-email').innerText()) === USER.email, 'the menu shows which account is signed in');
+if (SHOTS) await page.screenshot({ path: `${SHOTS}/6b-menu-signout.png` });
+
 // English and phone width.
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/en/studio/upload`);
@@ -173,6 +187,8 @@ check(true, 'studio works in English');
 const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 check(!overflow, 'no sideways scrolling at phone width');
 await shot('7-phone-en');
+await page.locator('.studio-nav').getByRole('button', { name: 'Sign out' }).click();
+check(await page.getByRole('heading', { name: 'Sign in' }).waitFor({ timeout: 5000 }).then(() => true, () => false), 'sign-out from the menu returns to sign-in');
 
 await browser.close();
 if (failures.length) {
