@@ -6,6 +6,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { CopyText, Loading, useLoad } from '@/components/studio/ui';
 import { useStudio } from '@/components/studio/shell';
 import * as api from '@/lib/studio/api';
+import { effectiveVisibility } from '@/lib/studio/image-utils';
 
 export default function StudioHome() {
   const { t, locale, gallery } = useStudio();
@@ -38,6 +39,9 @@ export default function StudioHome() {
           <p className="meta" style={{ margin: 0 }}>
             {origin.replace(/^https?:\/\//, '')}/@{gallery.handle} · {t.works(total)}
           </p>
+          <p className="meta" style={{ margin: 0 }}>
+            <Link href={`/${locale}/studio/settings`}>{t.galleryVisibility(t.visibilities[gallery.visibility])}</Link>
+          </p>
         </div>
         <div className="row">
           <CopyText text={`${origin}/@${gallery.handle}`} label={t.copyLink} done={t.copied} />
@@ -58,7 +62,7 @@ export default function StudioHome() {
                     <Link href={`/${locale}/studio/rooms/${r.id}`} className="room-row">
                       <span>
                         <strong>{r.title}</strong>
-                        <span className="meta"> · {t.works(r.artworks[0]?.count ?? 0)} · {t.visibilities[r.visibility]}</span>
+                        <span className="meta"> · {t.works(r.artworks[0]?.count ?? 0)} · {t.visibilities[effectiveVisibility(gallery.visibility, r.visibility)]}</span>
                       </span>
                       <span aria-hidden="true">›</span>
                     </Link>

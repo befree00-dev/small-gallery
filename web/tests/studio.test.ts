@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { fitSize, formatExif, isValidHandle, moveItem, normalizeHandle, titleFromFileName } from '../lib/studio/image-utils';
+import { effectiveVisibility, fitSize, formatExif, isValidHandle, moveItem, normalizeHandle, titleFromFileName } from '../lib/studio/image-utils';
 import { studioMessages } from '../lib/studio/messages';
 
 describe('fitSize', () => {
@@ -68,5 +68,14 @@ describe('studio messages', () => {
     expect(Object.keys(en).sort()).toEqual(Object.keys(ko).sort());
     expect(Object.keys(en.visibilities)).toEqual(Object.keys(ko.visibilities));
     expect(en.media).toHaveLength(ko.media.length);
+  });
+});
+
+describe('effectiveVisibility', () => {
+  it('applies the narrowest setting', () => {
+    expect(effectiveVisibility('unlisted', 'public')).toBe('unlisted');
+    expect(effectiveVisibility('public', 'public', 'private')).toBe('private');
+    expect(effectiveVisibility('public', 'public')).toBe('public');
+    expect(effectiveVisibility('private', 'unlisted', 'public')).toBe('private');
   });
 });

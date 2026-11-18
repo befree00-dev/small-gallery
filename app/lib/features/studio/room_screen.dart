@@ -136,7 +136,10 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                           subtitle: Text(
                             [
                               if (a.isFeatured) l10n.featured,
-                              visibilityLabel(l10n, a.visibility),
+                              visibilityLabel(
+                                l10n,
+                                effectiveAudience([gallery.visibility, room.visibility, a.visibility]),
+                              ),
                               '♡ ${a.likeCount}',
                             ].join(' · '),
                             style: const TextStyle(color: Palette.muted, fontSize: 12),

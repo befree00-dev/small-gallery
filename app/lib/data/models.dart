@@ -39,6 +39,9 @@ enum ArtField {
       ArtField.values.firstWhere((v) => v.name == value, orElse: () => ArtField.other);
 }
 
+/// What actually applies: the narrowest of gallery, room and work settings.
+Audience effectiveAudience(List<Audience> levels) => levels.fold(Audience.public, (a, b) => b.index > a.index ? b : a);
+
 /// Picks the English text when the viewer reads English and the artist wrote one.
 String localized(String ko, String? en, String languageCode) =>
     languageCode == 'en' && en != null && en.trim().isNotEmpty ? en : ko;

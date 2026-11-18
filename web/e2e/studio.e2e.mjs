@@ -55,7 +55,8 @@ async function mockSupabase(page) {
 
     if (table === 'galleries') {
       if (method === 'POST') {
-        state.gallery = { id: 'g1', owner_id: USER.id, bio: '', title_en: null, bio_en: null, visibility: 'public', rating_enabled: true, comment_policy: 'approve', ...body };
+        // Like the database default: new galleries start link-only.
+        state.gallery = { id: 'g1', owner_id: USER.id, bio: '', title_en: null, bio_en: null, visibility: 'unlisted', rating_enabled: true, comment_policy: 'approve', ...body };
         return rows(route, [state.gallery]);
       }
       if (method === 'PATCH') return json(route, 204, null);
@@ -128,6 +129,8 @@ await page.getByRole('button', { name: '갤러리 열기' }).click();
 await page.getByRole('heading', { name: '민호의 풍경' }).waitFor();
 check(state.gallery?.handle === 'minho_photo' && state.gallery?.theme === 'dark' && state.gallery?.field === 'photo', 'gallery created with handle, theme and field');
 check(await page.getByText('첫 번째 전시실').waitFor({ timeout: 5000 }).then(() => true, () => false), 'a first room is created');
+check(await page.getByText('공개 범위: 링크가 있는 사람만').isVisible(), 'the studio shows the gallery is link-only');
+check((await page.locator('.room-row', { hasText: '첫 번째 전시실' }).innerText()).includes('링크가 있는 사람만'), 'a room inside shows what actually applies, not "public"');
 await shot('4-studio-home');
 
 // Upload a photo that carries GPS data.

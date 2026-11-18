@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useStudio } from '@/components/studio/shell';
 import { Loading, Thumb, Toast, useLoad, useToast } from '@/components/studio/ui';
 import * as api from '@/lib/studio/api';
-import { moveItem } from '@/lib/studio/image-utils';
+import { effectiveVisibility, moveItem } from '@/lib/studio/image-utils';
 
 export default function RoomPage() {
   const { t, locale, gallery } = useStudio();
@@ -117,7 +117,7 @@ export default function RoomPage() {
                       <span className="work-title">
                         <strong>{a.title}</strong>
                         <span className="meta">
-                          {[a.is_featured ? t.featured : null, t.visibilities[a.visibility], `♡ ${a.like_count}`].filter(Boolean).join(' · ')}
+                          {[a.is_featured ? t.featured : null, t.visibilities[effectiveVisibility(gallery.visibility, room?.visibility ?? 'public', a.visibility)], `♡ ${a.like_count}`].filter(Boolean).join(' · ')}
                         </span>
                       </span>
                       <button className="btn btn-quiet icon" aria-label={t.moveUp(a.title)} disabled={i === 0} onClick={() => reorder(i, i - 1)}>↑</button>

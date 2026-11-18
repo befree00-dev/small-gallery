@@ -64,3 +64,11 @@ export function normalizeHandle(input: string): string {
   s = s.slice(s.lastIndexOf('@') + 1);
   return s.slice(s.lastIndexOf('/') + 1);
 }
+
+const reach = { public: 0, unlisted: 1, private: 2 } as const;
+type Audience = keyof typeof reach;
+
+/** What actually applies: the narrowest of gallery, room and work settings. */
+export function effectiveVisibility(...levels: Audience[]): Audience {
+  return levels.reduce((a, b) => (reach[b] > reach[a] ? b : a), 'public');
+}

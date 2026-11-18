@@ -51,6 +51,11 @@ class StudioHomeScreen extends ConsumerWidget {
               Text('$siteHost/@${gallery.handle}', style: const TextStyle(color: Palette.muted, fontSize: 13)),
               const SizedBox(height: 4),
               Text(
+                '${l10n.visibility}: ${visibilityLabel(l10n, gallery.visibility)}',
+                style: const TextStyle(color: Palette.muted, fontSize: 13),
+              ),
+              const SizedBox(height: 4),
+              Text(
                 l10n.galleryStats(list.fold(0, (s, r) => s + r.artworkCount), list.length),
                 style: const TextStyle(color: Palette.muted, fontSize: 13),
               ),
@@ -70,7 +75,7 @@ class StudioHomeScreen extends ConsumerWidget {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       title: Text(room.title, style: const TextStyle(fontWeight: FontWeight.w500)),
                       subtitle: Text(
-                        '${l10n.artworksCount(room.artworkCount)} · ${visibilityLabel(l10n, room.visibility)}',
+                        '${l10n.artworksCount(room.artworkCount)} · ${visibilityLabel(l10n, effectiveAudience([gallery.visibility, room.visibility]))}',
                         style: const TextStyle(color: Palette.muted),
                       ),
                       trailing: const Icon(Icons.chevron_right),

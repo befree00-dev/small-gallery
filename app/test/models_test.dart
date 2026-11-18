@@ -61,4 +61,10 @@ void main() {
     expect(sniffImageType(Uint8List.fromList([...'RIFF'.codeUnits, 0, 0, 0, 0, ...'WEBP'.codeUnits])), 'image/webp');
     expect(sniffImageType(Uint8List.fromList([0, 0, 0, 0x18, ...'ftypheic'.codeUnits])), 'image/heic');
   });
+
+  test('the narrowest visibility applies', () {
+    expect(effectiveAudience([Audience.unlisted, Audience.public]), Audience.unlisted);
+    expect(effectiveAudience([Audience.public, Audience.public, Audience.private]), Audience.private);
+    expect(effectiveAudience([Audience.public, Audience.public]), Audience.public);
+  });
 }
