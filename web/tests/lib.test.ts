@@ -121,3 +121,12 @@ describe('neighbors', () => {
     expect(neighbors(list, 'x')).toEqual({ index: -1, prev: null, next: null });
   });
 });
+
+describe('niceMax', () => {
+  it('rounds the axis up to an even step', async () => {
+    const { niceMax } = await import('../components/admin/daily-bars');
+    expect(niceMax(123)).toEqual({ top: 150, step: 50 });
+    expect(niceMax(2)).toEqual({ top: 2, step: 1 });
+    expect(niceMax(0)).toEqual({ top: 4, step: 2 });
+  });
+});

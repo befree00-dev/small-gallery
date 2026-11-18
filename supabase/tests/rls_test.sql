@@ -8,6 +8,7 @@
 \set as_anon 'reset role; set request.jwt.claim.sub = ''''; set role anon;'
 \set as_artist 'reset role; set request.jwt.claim.sub = ''00000000-0000-0000-0000-00000000000a''; set role authenticated;'
 \set as_visitor 'reset role; set request.jwt.claim.sub = ''00000000-0000-0000-0000-00000000000b''; set role authenticated;'
+\set as_ops 'reset role; set request.jwt.claim.sub = ''00000000-0000-0000-0000-0000000000c1''; set role authenticated;'
 
 -- Users ---------------------------------------------------------------------
 insert into auth.users (id, email, raw_user_meta_data) values
@@ -293,6 +294,93 @@ end $$;
 do $$ begin
   assert exists (select 1 from pg_constraint where conname = 'galleries_owner_id_fkey'), 'galleries_owner_id_fkey exists';
   assert exists (select 1 from pg_constraint where conname = 'comments_author_id_fkey'), 'comments_author_id_fkey exists';
+end $$;
+
+-- Profiles: users edit their name, never their plan ----------------------------
+:as_visitor
+update public.profiles set display_name = '방문자' where id = '00000000-0000-0000-0000-00000000000b';
+do $$ declare ok boolean := false; begin
+  assert (select display_name from public.profiles where id = '00000000-0000-0000-0000-00000000000b') = '방문자', 'users rename themselves';
+  begin update public.profiles set plan = 'plus' where id = '00000000-0000-0000-0000-00000000000b';
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'users cannot upgrade their own plan';
+end $$;
+
+-- Admin mode ------------------------------------------------------------------
+:as_visitor
+insert into public.reports (target_type, target_id, reporter_id, reason)
+values ('comment', '40000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000b', 'abuse');
+
+do $$ declare ok boolean := false; begin
+  assert not public.is_admin(), 'a visitor is not an admin';
+  begin perform public.admin_overview();
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'non-admins cannot read service statistics';
+end $$;
+
+do $$ declare ok boolean := false; begin
+  begin perform * from public.admins;
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'the admin list is not readable';
+end $$;
+
+do $$ declare ok boolean := false; begin
+  begin insert into public.admins (user_id) values ('00000000-0000-0000-0000-00000000000b');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'users cannot make themselves admin';
+end $$;
+
+:as_artist
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_set_gallery_visibility('10000000-0000-0000-0000-000000000001', 'public');
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'non-admins cannot use moderation functions';
+end $$;
+
+:as_anon
+do $$ declare ok boolean := false; begin
+  begin perform public.admin_overview();
+  exception when insufficient_privilege then ok := true; end;
+  assert ok, 'anonymous callers cannot read service statistics';
+end $$;
+
+:as_admin
+insert into public.admins (user_id) values ('00000000-0000-0000-0000-0000000000c1');
+
+:as_ops
+do $$ declare o jsonb; begin
+  assert public.is_admin(), 'an operator is an admin';
+  o := public.admin_overview();
+  assert (o->'users'->>'total')::int = 6 and (o->'users'->>'today')::int = 6, 'users today and total';
+  assert (o->'galleries'->>'today')::int = 1, 'galleries created today';
+  assert (o->'artworks'->>'total')::int = 100, 'artworks total';
+  assert (o->'comments'->>'total')::int = 3, 'comments total';
+  assert (o->'ratings'->>'total')::int = 5, 'ratings total';
+  assert (o->'views'->>'today')::int = 2, 'gallery views today (artwork views not double counted)';
+  assert (o->>'pending_comments')::int = 1, 'pending comments';
+  assert (o->>'open_reports')::int = 1, 'open reports';
+  assert (o->>'day')::date = public.kst_today(), 'today is the Korean day';
+end $$;
+
+do $$ begin
+  assert (select count(*) from public.admin_daily(7)) = 7, 'one row per day';
+  assert (select galleries from public.admin_daily(7) order by day desc limit 1) = 1, 'today''s new galleries in the daily series';
+  assert (select views from public.admin_daily(7) order by day desc limit 1) = 2, 'today''s views in the daily series';
+  assert (select count(*) from public.admin_galleries(10)) = 1, 'gallery list includes private galleries';
+  assert (select artworks from public.admin_galleries(10)) = 100, 'gallery list counts artworks';
+  assert (select count(*) from public.admin_comments(10)) = 3, 'comment list includes pending ones';
+  assert (select target_label from public.admin_reports()) = '분홍빛이 정말 좋아요', 'reports show what was reported';
+  assert (select gallery_handle from public.admin_reports()) = 'jisu', 'reports show where';
+end $$;
+
+select public.admin_set_comment_status('40000000-0000-0000-0000-000000000001', 'hidden');
+select public.admin_set_gallery_visibility('10000000-0000-0000-0000-000000000001', 'public');
+select public.admin_resolve_report((select id from public.admin_reports()), 'actioned');
+
+do $$ begin
+  assert (select status from public.admin_comments(10) where id = '40000000-0000-0000-0000-000000000001') = 'hidden', 'admins hide comments';
+  assert (select visibility from public.admin_galleries(10)) = 'public', 'admins change gallery visibility';
+  assert (select count(*) from public.admin_reports()) = 0, 'resolved reports leave the queue';
 end $$;
 
 \echo 'All RLS tests passed.'

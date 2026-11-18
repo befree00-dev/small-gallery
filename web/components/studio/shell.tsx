@@ -125,7 +125,7 @@ function StudioNav() {
   );
 }
 
-function AuthForm({ locale, t }: { locale: Locale; t: StudioStrings }) {
+export function AuthForm({ locale, t }: { locale: Locale; t: StudioStrings }) {
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
