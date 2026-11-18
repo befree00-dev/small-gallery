@@ -10,3 +10,6 @@ app/build/
 app/.dart_tool/
 
 .DS_Store
+
+# Test builds handed out for manual testing
+*.apk
