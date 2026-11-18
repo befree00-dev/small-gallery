@@ -11,6 +11,7 @@ export interface Gallery {
   bio: string;
   bio_en: string | null;
   theme: 'white' | 'dark' | 'wood';
+  visibility: Audience;
   rating_enabled: boolean;
   comment_policy: 'open' | 'approve' | 'off';
   profiles: { display_name: string } | null;

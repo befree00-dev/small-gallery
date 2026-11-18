@@ -53,6 +53,7 @@ end $$;
 
 do $$ begin
   assert (select count(*) from public.artworks) = 3, 'the artist sees all of their artworks';
+  assert (select visibility from public.galleries where handle = 'jisu') = 'unlisted', 'new galleries start unlisted';
 end $$;
 
 do $$ declare ok boolean := false; begin

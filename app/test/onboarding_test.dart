@@ -30,7 +30,8 @@ void main() {
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
 
-    // Step 3: theme
+    // Step 3: theme, and the note that the gallery starts link-only
+    expect(find.textContaining('링크가 있는 사람만 볼 수 있어요'), findsOneWidget);
     await tester.tap(find.text('다크 룸'));
     await tester.tap(find.widgetWithText(FilledButton, '갤러리 열기'));
     await tester.pumpAndSettle();

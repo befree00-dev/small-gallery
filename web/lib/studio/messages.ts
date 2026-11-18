@@ -32,6 +32,7 @@ const ko = {
   back: '이전',
   create: '갤러리 열기',
   firstRoom: '첫 번째 전시실',
+  startsUnlisted: '처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.',
 
   navGallery: '갤러리',
   navUpload: '업로드',
@@ -158,6 +159,7 @@ const en: Strings = {
   back: 'Back',
   create: 'Open gallery',
   firstRoom: 'First room',
+  startsUnlisted: 'At first only people with the link can see it, and it stays out of search engines. You can make it public in settings.',
 
   navGallery: 'Gallery',
   navUpload: 'Upload',

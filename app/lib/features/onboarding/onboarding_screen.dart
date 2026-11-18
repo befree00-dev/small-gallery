@@ -204,6 +204,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
           ],
         ),
+        const SizedBox(height: 16),
+        Text(l10n.startsUnlisted, style: const TextStyle(color: Palette.muted, height: 1.5)),
       ],
     );
   }

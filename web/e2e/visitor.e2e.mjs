@@ -16,7 +16,7 @@ const SHOTS = process.env.SHOTS_DIR;
 const id = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const gallery = {
   id: id(1), owner_id: id(9), handle: 'jisu', title: '지수의 작은 정원', title_en: null, bio: '', bio_en: null,
-  theme: 'white', rating_enabled: true, comment_policy: 'approve', profiles: { display_name: '김지수' },
+  theme: 'white', visibility: 'unlisted', rating_enabled: true, comment_policy: 'approve', profiles: { display_name: '김지수' },
 };
 const rooms = [
   { id: id(21), gallery_id: id(1), title: '봄의 산책', title_en: 'Spring walk', statement: '', statement_en: null, sort_order: 0 },
@@ -108,6 +108,17 @@ try {
 
   await page.goto(`${BASE}/en/@jisu/a/${id(31)}`);
   check((await position(page)) === '1 of 3 · Spring walk', 'English position and room name');
+
+  // Link-only galleries stay out of search engines; public ones do not.
+  const robots = async (path) => {
+    await page.goto(`${BASE}${path}`);
+    return (await page.locator('meta[name="robots"]').getAttribute('content').catch(() => null)) ?? '';
+  };
+  check((await robots('/ko/@jisu')).includes('noindex'), 'a link-only gallery asks search engines not to index it');
+  check((await robots(`/ko/@jisu/a/${id(31)}`)).includes('noindex'), '…and its artworks');
+  gallery.visibility = 'public';
+  check(!(await robots('/ko/@jisu')).includes('noindex'), 'a public gallery can be indexed');
+  gallery.visibility = 'unlisted';
 
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await phone.goto(`${BASE}/ko/@jisu/a/${id(32)}`);

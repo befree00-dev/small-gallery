@@ -323,6 +323,7 @@ function CreateGallery({
           {step < 2 ? t.next : t.create}
         </button>
       </div>
+      {step === 2 && <p className="notice" style={{ margin: 0 }}>{t.startsUnlisted}</p>}
       <span className="meta" lang={locale}>{t.addressFixed}</span>
     </section>
   );

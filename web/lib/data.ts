@@ -3,7 +3,8 @@ import { cache } from 'react';
 import { serverClient } from './supabase';
 import type { Artwork, Comment, Gallery, RatingStats, Room } from './types';
 
-const galleryColumns = 'id, owner_id, handle, title, title_en, bio, bio_en, theme, rating_enabled, comment_policy, profiles!galleries_owner_id_fkey(display_name)';
+const galleryColumns =
+  'id, owner_id, handle, title, title_en, bio, bio_en, theme, visibility, rating_enabled, comment_policy, profiles!galleries_owner_id_fkey(display_name)';
 
 // cache(): generateMetadata and the page share one query per request.
 export const getGallery = cache(async (handle: string): Promise<Gallery | null> => {
@@ -82,4 +83,9 @@ export function neighbors<T extends { id: string }>(list: T[], id: string): { in
   const index = list.findIndex((a) => a.id === id);
   if (index < 0) return { index, prev: null, next: null };
   return { index, prev: list[index - 1] ?? null, next: list[index + 1] ?? null };
+}
+
+/** Unlisted galleries are for people with the link: keep them out of search engines. */
+export function robotsFor(gallery: { visibility?: string }) {
+  return gallery.visibility === 'public' ? undefined : { index: false, follow: false };
 }

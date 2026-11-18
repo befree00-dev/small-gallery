@@ -122,6 +122,7 @@ await page.getByText('쓸 수 있는 주소예요').waitFor();
 check(true, 'the address is checked and normalized');
 await shot('3-create-address');
 await page.getByRole('button', { name: '다음' }).click();
+check(await page.getByText('처음에는 링크가 있는 사람만 볼 수 있어요', { exact: false }).isVisible(), 'creating a gallery says it starts link-only');
 await page.getByText('다크 룸').click();
 await page.getByRole('button', { name: '갤러리 열기' }).click();
 await page.getByRole('heading', { name: '민호의 풍경' }).waitFor();

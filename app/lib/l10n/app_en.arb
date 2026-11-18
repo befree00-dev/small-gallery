@@ -242,5 +242,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "startsUnlisted": "At first only people with the link can see it, and it stays out of search engines. You can make it public in settings."
 }

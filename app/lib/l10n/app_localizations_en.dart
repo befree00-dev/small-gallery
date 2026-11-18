@@ -475,4 +475,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String workPosition(int index, int total) {
     return '$index of $total';
   }
+
+  @override
+  String get startsUnlisted =>
+      'At first only people with the link can see it, and it stays out of search engines. You can make it public in settings.';
 }

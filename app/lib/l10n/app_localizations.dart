@@ -979,6 +979,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{index} / {total}'**
   String workPosition(int index, int total);
+
+  /// No description provided for @startsUnlisted.
+  ///
+  /// In ko, this message translates to:
+  /// **'처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.'**
+  String get startsUnlisted;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

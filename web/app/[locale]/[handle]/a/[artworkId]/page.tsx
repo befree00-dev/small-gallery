@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { ArrowKeyNav, LikeButton, ProtectedImage, RatingForm, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
-import { average, getArtwork, getArtworks, getComments, getGallery, getRatingStats, getRooms, groupByRoom, neighbors } from '@/lib/data';
+import { average, getArtwork, getArtworks, getComments, getGallery, getRatingStats, getRooms, groupByRoom, neighbors, robotsFor } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
 import { imageUrl } from '@/lib/supabase';
 import { criteria, PUBLIC_RATING_THRESHOLD } from '@/lib/types';
@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const title = pick(artwork.title, artwork.title_en, locale);
   const description = pick(artwork.note, artwork.note_en, locale) || pick(gallery.title, gallery.title_en, locale);
   return {
+    robots: robotsFor(gallery),
     title: `${title} · ${pick(gallery.title, gallery.title_en, locale)}`,
     description,
     alternates: {

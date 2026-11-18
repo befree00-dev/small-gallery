@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { CopyLink, OwnerLink, ProtectedImage, ViewTracker } from '@/components/client';
 import { Comments } from '@/components/comments';
-import { getArtworks, getComments, getGallery, getRooms, groupByRoom } from '@/lib/data';
+import { getArtworks, getComments, getGallery, getRooms, groupByRoom, robotsFor } from '@/lib/data';
 import { isLocale, messages, parseHandle, pick, type Locale } from '@/lib/i18n';
 import { siteOrigin } from '@/lib/site';
 import { imageUrl } from '@/lib/supabase';
@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const title = pick(gallery.title, gallery.title_en, locale);
   const description = pick(gallery.bio, gallery.bio_en, locale) || messages(locale).intro;
   return {
+    robots: robotsFor(gallery),
     title,
     description,
     alternates: { languages: { ko: `/ko/@${gallery.handle}`, en: `/en/@${gallery.handle}` } },

@@ -474,4 +474,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String workPosition(int index, int total) {
     return '$index / $total';
   }
+
+  @override
+  String get startsUnlisted => '처음에는 링크가 있는 사람만 볼 수 있어요. 검색에도 나오지 않아요. 설정에서 전체 공개로 바꿀 수 있어요.';
 }
