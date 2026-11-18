@@ -7,3 +7,24 @@ export function linkOutcome(hash: string, search: string): 'tokens' | 'code' | '
   if (q.get('code')) return 'code';
   return null;
 }
+
+export type SignInProblem = 'rateLimit' | 'notAuthorized' | 'signupOff' | 'badEmail' | 'error';
+
+/** Why Supabase refused to send a sign-in email, from its error code and HTTP status. */
+export function signInProblem(code: string | undefined, status: number | undefined): SignInProblem {
+  switch (code) {
+    case 'over_email_send_rate_limit':
+    case 'over_request_rate_limit':
+      return 'rateLimit';
+    case 'email_address_not_authorized':
+      return 'notAuthorized';
+    case 'signup_disabled':
+    case 'otp_disabled':
+    case 'email_provider_disabled':
+      return 'signupOff';
+    case 'email_address_invalid':
+    case 'validation_failed':
+      return 'badEmail';
+  }
+  return status === 429 ? 'rateLimit' : 'error';
+}

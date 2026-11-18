@@ -63,6 +63,9 @@ const fake = createServer((req, res) => {
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       otpRequests.at(-1).body = JSON.parse(body || '{}');
+      if (otpRequests.at(-1).body.email === 'busy@example.com') {
+        return send(429, { code: 429, error_code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' });
+      }
       send(200, {});
     });
     return;
@@ -160,6 +163,14 @@ try {
   check(await visitor.getByText('로그인했어요').isVisible(), 'a message says they are signed in');
   check((await visitor.getByLabel('로그인하면 평가와 감상평을 남길 수 있어요').count()) === 0, 'the email form is replaced by the comment form');
   if (SHOTS) await visitor.screenshot({ path: `${SHOTS}/signed-in.png` });
+
+  // When Supabase will not send the email, the visitor is told why.
+  const busy = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await busy.goto(`${BASE}/ko/@jisu`);
+  await busy.getByLabel('로그인하면 평가와 감상평을 남길 수 있어요').fill('busy@example.com');
+  await busy.getByRole('button', { name: '로그인 링크 받기' }).click();
+  await busy.getByRole('alert').filter({ hasText: '너무 많이' }).waitFor({ timeout: 5000 }).catch(() => {});
+  check(await busy.getByText('짧은 시간에 너무 많이 요청했어요').isVisible(), 'the email rate limit is explained, not a generic error');
 
   // An expired link explains itself instead of doing nothing.
   const fresh = await browser.newPage({ viewport: { width: 390, height: 844 } });

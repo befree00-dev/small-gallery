@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { linkOutcome } from '../lib/auth-link';
+import { linkOutcome, signInProblem } from '../lib/auth-link';
 
 describe('linkOutcome', () => {
   it('finds the session tokens an implicit-flow link leaves in the hash', () => {
@@ -16,5 +16,16 @@ describe('linkOutcome', () => {
   it('ignores ordinary addresses', () => {
     expect(linkOutcome('', '?room=abc')).toBeNull();
     expect(linkOutcome('#comments', '')).toBeNull();
+  });
+});
+
+describe('signInProblem', () => {
+  it('names the usual reasons Supabase refuses to send a sign-in email', () => {
+    expect(signInProblem('over_email_send_rate_limit', 429)).toBe('rateLimit');
+    expect(signInProblem(undefined, 429)).toBe('rateLimit');
+    expect(signInProblem('email_address_not_authorized', 400)).toBe('notAuthorized');
+    expect(signInProblem('signup_disabled', 422)).toBe('signupOff');
+    expect(signInProblem('email_address_invalid', 400)).toBe('badEmail');
+    expect(signInProblem('unexpected_failure', 500)).toBe('error');
   });
 });

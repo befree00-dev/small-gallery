@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 
+import { signInProblem, type SignInProblem } from '@/lib/auth-link';
 import { messages, type Locale } from '@/lib/i18n';
 import { browserClient } from '@/lib/supabase';
 import { criteria, type Criterion, type Scores } from '@/lib/types';
@@ -123,6 +124,7 @@ export function SignIn({ locale }: { locale: Locale }) {
   const t = messages(locale);
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [problem, setProblem] = useState<{ kind: SignInProblem; code?: string }>({ kind: 'error' });
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -133,6 +135,10 @@ export function SignIn({ locale }: { locale: Locale }) {
       email,
       options: { emailRedirectTo: window.location.origin + here, data: { locale } },
     });
+    if (error) {
+      console.warn('[sign-in]', error.status, error.code, error.message);
+      setProblem({ kind: signInProblem(error.code, error.status), code: error.code ?? (error.status ? String(error.status) : undefined) });
+    }
     setState(error ? 'error' : 'sent');
   }
 
@@ -144,7 +150,12 @@ export function SignIn({ locale }: { locale: Locale }) {
         <input id="signin-email" className="input" type="email" required autoComplete="email" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
       <button className="btn" type="submit" disabled={state === 'sending'}>{t.sendLink}</button>
-      {state === 'error' && <p className="notice" role="alert">{t.error}</p>}
+      {state === 'error' && (
+        <p className="notice" role="alert">
+          {t.signInProblem[problem.kind]}
+          {problem.code && <span className="meta"> ({problem.code})</span>}
+        </p>
+      )}
     </form>
   );
 }
