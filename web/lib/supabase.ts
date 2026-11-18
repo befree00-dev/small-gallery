@@ -14,9 +14,13 @@ export function serverClient(): SupabaseClient {
 
 let browser: SupabaseClient | null = null;
 
-/** Browser client that keeps the visitor's session (magic-link sign-in). */
+/**
+ * Browser client that keeps the visitor's session (magic-link sign-in).
+ * Implicit flow: the link carries the session itself, so it works even when the
+ * mail app opens it in another browser (PKCE needs the browser that asked).
+ */
 export function browserClient(): SupabaseClient {
-  browser ??= createClient(url, key, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'pkce' } });
+  browser ??= createClient(url, key, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'implicit' } });
   return browser;
 }
 

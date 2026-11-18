@@ -539,3 +539,15 @@ dialog.confirm p { margin: 0; color: var(--ink-soft); font-size: 14px; }
     linear-gradient(#8fa58e, #8fa58e) 100% 100% / 38% 48% no-repeat,
     var(--ground);
 }
+
+/* Result of opening an emailed sign-in link. */
+.auth-banner {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50;
+  display: flex; align-items: center; gap: 12px;
+  width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box;
+  padding: 12px 12px 12px 18px; border-radius: 10px;
+  background: #1c1b19; color: #f6f5f1; font-size: 14px; line-height: 1.5;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); word-break: keep-all;
+}
+.auth-banner[data-tone='warn'] { background: #7a2e12; }
+.auth-banner-close { background: none; border: 0; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; }

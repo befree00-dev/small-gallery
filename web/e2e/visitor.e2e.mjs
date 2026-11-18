@@ -30,6 +30,8 @@ const work = (n, room, order, title) => ({
 // Stored out of order on purpose: the page must follow room order, then sort_order.
 const artworks = [work(33, id(22), 0, '창가의 레몬'), work(32, id(21), 1, '비 갠 골목'), work(31, id(21), 0, '4월, 개천 옆 벚나무')];
 const tables = { galleries: [gallery], rooms, artworks, comments: [], artwork_rating_stats: [] };
+const otpRequests = [];
+const visitorUser = { id: id(77), aud: 'authenticated', role: 'authenticated', email: 'visitor@example.com', app_metadata: {}, user_metadata: {}, created_at: '2026-11-18T00:00:00Z' };
 const photo = readFileSync(new URL('./fixtures/camera-with-gps.jpg', import.meta.url));
 
 function filterRows(rows, params) {
@@ -55,6 +57,17 @@ const fake = createServer((req, res) => {
   if (url.pathname === '/rest/v1/rpc/has_liked') return send(200, false);
   if (url.pathname === '/rest/v1/rpc/toggle_like') return send(200, [{ liked: true, like_count: 4 }]);
   if (url.pathname.startsWith('/rest/v1/rpc/')) return send(200, null);
+  if (url.pathname === '/auth/v1/otp') {
+    otpRequests.push({ redirectTo: url.searchParams.get('redirect_to') });
+    let body = '';
+    req.on('data', (c) => (body += c));
+    req.on('end', () => {
+      otpRequests.at(-1).body = JSON.parse(body || '{}');
+      send(200, {});
+    });
+    return;
+  }
+  if (url.pathname === '/auth/v1/user') return send(200, visitorUser);
   if (url.pathname.startsWith('/auth/v1/')) return send(200, {});
   const table = url.pathname.replace('/rest/v1/', '');
   const rows = filterRows(tables[table] ?? [], url.searchParams);
@@ -127,6 +140,36 @@ try {
   check(box !== null && box.width >= 44 && box.height >= 44, 'arrow buttons are at least 44px on a phone');
   if (SHOTS) await phone.screenshot({ path: `${SHOTS}/viewer-phone.png` });
 } finally {
+  // Signing in from a gallery: the emailed link may open on another page (or in another
+  // browser), and must still sign the visitor in and bring them back to the gallery.
+  const visitor = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await visitor.goto(`${BASE}/ko/@jisu`);
+  await visitor.getByLabel('로그인하면 평가와 감상평을 남길 수 있어요').fill('visitor@example.com');
+  await visitor.getByRole('button', { name: '로그인 링크 받기' }).click();
+  await visitor.getByText('메일로 로그인 링크를 보냈어요').waitFor();
+  const otp = otpRequests.at(-1);
+  check(otp?.redirectTo === `${BASE}/ko/@jisu`, `the link returns to the gallery (${otp?.redirectTo})`);
+  check(otp?.body && !otp.body.code_challenge, 'the link does not depend on the requesting browser (no PKCE challenge)');
+
+  // Supabase falls back to the site root when a redirect is not allow-listed: still lands back in the gallery.
+  const token = 'header.' + Buffer.from(JSON.stringify({ sub: id(77), exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url') + '.sig';
+  await visitor.goto(`${BASE}/ko#access_token=${token}&refresh_token=r1&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=magiclink`);
+  await visitor.waitForURL(`${BASE}/ko/@jisu`, { timeout: 10000 }).catch(() => {});
+  check(visitor.url() === `${BASE}/ko/@jisu`, `after the link, the visitor is back in the gallery (${visitor.url()})`);
+  await visitor.getByRole('status').filter({ hasText: '로그인했어요' }).waitFor({ timeout: 5000 }).catch(() => {});
+  check(await visitor.getByText('로그인했어요').isVisible(), 'a message says they are signed in');
+  check((await visitor.getByLabel('로그인하면 평가와 감상평을 남길 수 있어요').count()) === 0, 'the email form is replaced by the comment form');
+  if (SHOTS) await visitor.screenshot({ path: `${SHOTS}/signed-in.png` });
+
+  // An expired link explains itself instead of doing nothing.
+  const fresh = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await fresh.goto(`${BASE}/ko/@jisu#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired`);
+  await fresh.getByRole('alert').filter({ hasText: '만료' }).waitFor({ timeout: 5000 }).catch(() => {});
+  check(await fresh.getByText('로그인 링크가 만료됐거나').isVisible(), 'an expired link shows what to do');
+  check(!(await fresh.evaluate(() => location.hash.includes('error'))), 'the error is cleared from the address');
+  check(!(await fresh.evaluate(() => document.documentElement.scrollWidth > innerWidth)), 'the message fits a phone');
+  if (SHOTS) await fresh.screenshot({ path: `${SHOTS}/link-expired.png` });
+
   await browser.close();
   fake.close();
 }

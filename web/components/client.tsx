@@ -8,6 +8,8 @@ import { messages, type Locale } from '@/lib/i18n';
 import { browserClient } from '@/lib/supabase';
 import { criteria, type Criterion, type Scores } from '@/lib/types';
 
+import { rememberReturn } from './auth-return';
+
 // Visitor-side interactions. The server renders the page; these attach behavior.
 
 export function useSession(): Session | null | undefined {
@@ -125,9 +127,11 @@ export function SignIn({ locale }: { locale: Locale }) {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setState('sending');
+    const here = window.location.pathname + window.location.search;
+    rememberReturn(here);
     const { error } = await browserClient().auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.href, data: { locale } },
+      options: { emailRedirectTo: window.location.origin + here, data: { locale } },
     });
     setState(error ? 'error' : 'sent');
   }

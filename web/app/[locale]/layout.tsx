@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
+import { AuthReturn } from '@/components/auth-return';
 import { isLocale, messages } from '@/lib/i18n';
 import { siteOrigin } from '@/lib/site';
 
@@ -33,7 +34,10 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;900&display=swap"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthReturn locale={locale} />
+        {children}
+      </body>
     </html>
   );
 }
